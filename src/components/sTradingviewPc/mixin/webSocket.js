@@ -4,7 +4,8 @@ export const webSocketMixin = {
     return {
       isWebsock: false,
       arrayData: [],
-      limit: 200,
+      marksData: [], //标记数组
+      limit: 10,
       websockTime: '', //心跳
       tempUid: Math.random().toString(36).substr(2, 10), //随机uid
     }
@@ -28,7 +29,6 @@ export const webSocketMixin = {
           } catch (e) {
             console.log('websocket...异常', e)
           }
-          console.log('接下啦')
           // 实例化socket
           self.websock = new WebSocket(self.wsUrl)
           // 监听socket连接
@@ -74,6 +74,7 @@ export const webSocketMixin = {
             instId: 'BTC-USDT-SWAP', //交易对名称, 例如 BTC-USDT
             limit: this.limit, //	限制数量, 默认为1000
             autoPush: true, //是否自动推送，默认true
+            bar: self.interval, //15m,30m,1h,1d 默认1d
           },
         }
         self.websock.send(
@@ -100,7 +101,6 @@ export const webSocketMixin = {
     },
     //监听返回消息
     websockMessage(msg) {
-      console.log('收到消息', msg.data)
       const self = this
       let setInt = null
       let res = JSON.parse(msg.data)
@@ -130,7 +130,7 @@ export const webSocketMixin = {
             close: Number(item.data[2]),
             low: Number(item.data[3]),
             high: Number(item.data[4]),
-            volume: Number(item.data[5]),
+            // volume: Number(item.order),
             // 1. time: number UTC 时区的毫秒单位时间戳。time对于日K线的时间应为00:00 UTC(而非交易时段的开始时间)。图表库讲根据商品信息中的交易时段调整时间。每个月K线的时间是该月的第一个交易日，且无时间部分。
             // 2. open: number K线开盘价
             // 3. high: number K线最高价
@@ -144,10 +144,46 @@ export const webSocketMixin = {
             // low: Number(item.Low),
             // volume: Number(item.Volume),
           })
+          if (item.orders && item.orders.length) {
+            //id，time,color,text,label,labelFontColor,minSize
+            // item.order
+            // function getData(n) {
+            //   let now = new Date(n),
+            //     y = now.getFullYear(),
+            //     m = now.getMonth() + 1,
+            //     d = now.getDate();
+            //   return y + "-" + (m < 10 ? "0" + m : m) + "-" + (d < 10 ? "0" + d : d) + " " + now.toTimeString().substr(0, 8);
+            // }
+            // getData(1642583223751) //'2022-01-19 17:07:03'
+
+            let orderArray = item.orders
+            // console.log(orderArray, '订单数')
+            orderArray.forEach((el) => {
+              this.marksData.push({
+                id: el.ordId, //item.data[0] * 1000
+                time: el.cTime,
+                color: 'white',
+                text: el.px, //弹出式文字
+                label: el.side, //标记文字
+                labelFontColor: '#fff',
+                minSize: '14',
+              })
+            })
+            // this.marksData.push({
+            //   id: item.orders[0].ordId, //item.data[0] * 1000
+            //   time: item.orders[0].cTime,
+            //   color: 'white',
+            //   text: item.orders[0].px, //弹出式文字
+            //   label: item.orders[0].side, //标记文字
+            //   labelFontColor: '#fff',
+            //   minSize: '16',
+            // })
+          }
         })
         if (typeof this.onLoadedCallback == 'function') {
-          console.log('回调函数进入1', this.onLoadedCallback)
+          // console.log('回调函数进入1', this.onLoadedCallback)
           self.onLoadedCallback(this.arrayData)
+          // self.onDataCallback(this.marksData)
         } else {
           console.log('回调函数进入2', this.onLoadedCallback)
           setInt = setInterval(() => {
@@ -157,7 +193,14 @@ export const webSocketMixin = {
             }
           }, 100)
         }
-        console.log('回调函数进入3', this.onLoadedCallback)
+        if (typeof this.onDataedCallback == 'function') {
+          // console.log('回调函数进入1', this.onLoadedCallback)
+          // self.onLoadedCallback(this.arrayData)
+          self.onDataedCallback(this.marksData)
+        } else {
+          //
+        }
+        // console.log('回调函数进入3', this.onLoadedCallback)
         // self.$nextTick(() => {
         //   self.onLoadedCallback(arrayData);
         // });

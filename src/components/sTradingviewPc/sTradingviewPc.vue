@@ -61,7 +61,7 @@ export default {
     return {
       tabsArr: tabsConfig,
       symbol: "LTC_USDT", //币名称
-      interval: "1", //默认显示规则
+      interval: "1D", //默认显示规则
       chart: null,
       initdata: {},
       countDate: 0, //累加条数
@@ -69,6 +69,7 @@ export default {
       lengsData: 200, //结束长度
       datafeeds: new datafeeds(this),
       onLoadedCallback: null, //初始数据回调
+      onDataedCallback: null, //k线标记数据回调
       onRealtimeCallback: null //websocket数据回调
     }
   },
@@ -82,6 +83,7 @@ export default {
      * e {string} reset=重置数据
      */
     changeTabs(e) {
+      console.log(e, "eeeee======>")
       let self = this
       this.interval = e
       let chartType = e == "1s" ? 3 : 1
@@ -98,7 +100,7 @@ export default {
       return time == "1s" ? "1S" : time
     },
 
-    // 请求数据
+    // 请求数据 symbolInfo, resolution(周期）, periodParams, onHistoryCallback, onErrorCallback)
     getBars(
       symbolInfo,
       resolution,
@@ -107,6 +109,30 @@ export default {
       onLoadedCallback
     ) {
       this.onLoadedCallback = onLoadedCallback
+      // this.webSocket("load");
+    },
+
+    // 在k线上做标记 symbolInfo, startDate, endDate, onDataCallback, resolution)
+    // startDate: unix 时间戳, 最左边请求的K线时间
+    // endDate: unix 时间戳, 最右边请求的K线时间
+    // onDataCallback标记数字(marks)
+    //     mark为具有以下属性的对象:
+    // id: 唯一标识id 。当用户点击标记时，将传递给相应的回调:respective callback
+    // time: unix time, UTC
+    // color:red|green|blue|yellow|{ border: '#ff0000', background: '#00ff00' }
+    // text: 标记弹出式文字。 支持HTML
+    // label: 印在标记上的文字。单字符
+    // labelFontColor: label的文字颜色
+    // minSize: 标记的最小尺寸 (diameter, pixels)
+    // 每个K线允许几个标记（现在最多为10个）。不允许标记脱离K线。
+    getMarks(
+      symbolInfo,
+      rangeStartDate,
+      rangeEndDate,
+      onDataedCallback,
+      resolution
+    ) {
+      this.onDataedCallback = onDataedCallback
       // this.webSocket("load");
     },
 
@@ -221,7 +247,6 @@ export default {
         self.toggleStudies(self.interval)
         self.createButton(self.tabsArr)
       })
-      
     },
     // 创建按钮(这里是时间维度)，并对选中的按钮加上样式
     createButton(buttons) {
@@ -358,6 +383,13 @@ export default {
               null,
               {}
             ) //自定义MACD
+        }
+        if (self.getMarks) {
+          self.chart
+            .chart()
+            .createStudy("custom-marks", false, false, [], null, {
+              getMarks: this.getMarks
+            }) //MACD
         }
       } catch (e) {}
     },

@@ -61,7 +61,7 @@ class datafeeds {
   }
 
   /**
-	 * 用途：通过日期范围获取历史K线数据。图表库希望通过onHistoryCallback(onDataCallback)仅一次调用，接收所有的请求历史。而不是被多次调用。
+   * 用途：通过日期范围获取历史K线数据。图表库希望通过onHistoryCallback(onDataCallback)仅一次调用，接收所有的请求历史。而不是被多次调用。
    * @param {*Object} symbolInfo  商品信息对象
    * @param {*String} resolution  分辨率(时间周期)
    * @param {*Number} rangeStartDate  时间戳、最左边请求的K线时间
@@ -93,6 +93,47 @@ class datafeeds {
       rangeEndDate,
       onLoadedCallback
     )
+  }
+
+  getMarks(
+    symbolInfo,
+    rangeStartDate,
+    rangeEndDate,
+    onDataCallback,
+    resolution
+  ) {
+    const onDatedCallback = (data) => {
+      if (data && data.length) {
+        onDataCallback(data)
+      } else {
+        onDataCallback([])
+      }
+    }
+
+    // 调用你的实际数据获取函数
+    this.self.getMarks(
+      symbolInfo,
+      rangeStartDate,
+      rangeEndDate,
+      onDatedCallback,
+      resolution
+    )
+    // const onDataedCallback = (data) => {
+    //   data && data.length
+    //     ? onDataCallback(data, {
+    //         noData: false,
+    //       })
+    //     : onDataCallback([], {
+    //         noData: true,
+    //       })
+    // }
+    // this.self.getMarks(
+    //   symbolInfo,
+    //   rangeStartDate,
+    //   rangeEndDate,
+    //   onDataCallback,
+    //   resolution
+    // )
   }
 
   /**
