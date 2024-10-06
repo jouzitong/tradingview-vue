@@ -1,566 +1,706 @@
 <!DOCTYPE html>
-
 <html>
-       
-  <head>
-             
-    <meta charset="utf-8" />
-             
+<head>
+    <meta charset="utf-8"/>
     <title></title>
-         
-  </head>
-       
-  <body>
-             
-    <div id="trade-view">         </div>
-             
-    <script
-      src="static/tradeview/charting_library/charting_library.min.js"
-      type="text/javascript"
-      charset="utf-8"
-    ></script>
-             
-    <script
-      src="js/dataUpdater.js"
-      type="text/javascript"
-      charset="utf-8"
-    ></script>
-             
-    <script
-      src="js/datafees.js"
-      type="text/javascript"
-      charset="utf-8"
-    ></script>
-             
-    <script src="js/socket.js" type="text/javascript" charset="utf-8"></script>
-             
-    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-             
-    <script>
-                   var count = 0;             function TVjsApi() { //              
-       var urls = 'ws://*****'; //                var urls = 'ws://****/trade_market/websocket/btc_usdt'
-                      var urls = 'wss://api.fcoin.com/v2/ws';                 this.widgets
-      = null;                 this.socket = new socket(urls); //                this.socket
-      = new socket();                 this.datafeeds = new datafeeds(this);       
-               this.symbol = null,                     this.interval = null,       
-                   this.cacheData = {},                     this.lastTime = null,
-                          this.getBarTimer = null,                     this.isLoading
-      = true;                 var that = this;                 this.socket.doOpen()
-                      this.socket.on('open', function() {                     that.socket.send({
-                              cmd: 'req',                         args: ["candle.M5.ethusdt",
-      150, parseInt(Date.now() / 1000)]                     })                 })
-                      this.socket.on('message', that.onMessage)             }   
-               TVjsApi.prototype.init = function() {                 //设置默认symbol，interval的默认值
-                      var symbol = arguments.length > 0 && arguments[0] !== undefined
-      ? arguments[0] : 'ethusdt';                 var interval = arguments.length
-      > 0 && arguments[1] !== undefined ? arguments[1] : 5;                 if (!this.widgets)
-      {                     this.widgets = window.tvWidget = new TradingView.widget({
-                              //默认商品设置                         symbol: symbol,
-                              //默认请求间隔                         interval: interval,
-                              //默认是否全屏                         // fullscreen:
-      true,                         //默认是否自适应                         // autosize:true,  
-                                //设置容器                         container_id:
-      'trade-view',                         datafeed: this.datafeeds,           
-                   library_path: './static/tradeview/charting_library/',          
-                                        enabled_features: [],                   
-           timezone: 'Asia/Shanghai',                         locale: 'zh',       
-                       debug: false,                         //设置默认工具条背景颜色
-                              toolbar_bg:"#121A2E",                         //设置默认不显示组件
-                              disabled_features: [                             'header_symbol_search',
-                                  "use_localstorage_for_settings",               
-                   "left_toolbar",                             'legend_context_menu',
-                                  "border_around_the_chart",                       
-           "timeframes_toolbar",                             "volume_force_overlay",
-                                  "pane_context_menu",                           
-       "header_symbol_search",                             "symbol_search_hot_key",
-                                  "header_undo_redo",                           
-       "header_compare",                             "header_chart_type",       
-                           "header_screenshot",                             "header_resolutions",
-                                  // "header_settings",                           
-       // "header_indicators"                         ],                         //设置初始化样式配置
-                              overrides: {                             "mainSeriesProperties.candleStyle.upColor":
-      "#589065",                             "mainSeriesProperties.candleStyle.downColor":
-      "#AE4E54",                             "mainSeriesProperties.candleStyle.drawWick":
-      true,                             "mainSeriesProperties.candleStyle.wickUpColor:":
-      '#AE4E54',                             "mainSeriesProperties.candleStyle.wickDownColor":
-      "#AE4E54",                             "mainSeriesProperties.candleStyle.drawBorder":
-      true,                             "mainSeriesProperties.candleStyle.borderUpColor":
-      "#589065",                             "mainSeriesProperties.candleStyle.borderDownColor":
-      "#AE4E54",                             //-----------------------------------------------------------------------
-                                  "paneProperties.background": "#121a2e",       
-                           "paneProperties.vertGridProperties.color": "#1e273c",
-                                  "paneProperties.vertGridProperties.style": 0,   
-                               "paneProperties.horzGridProperties.color": "#1e273c",
-                                  "paneProperties.horzGridProperties.style": 0,   
-                               "scalesProperties.lineColor": "#505d7b",           
-                       "scalesProperties.textColor": "#333e58",                   
-                                    "paneProperties.legendProperties.showLegend":
-      false,                             //"scalesProperties.showLeftScale":false,
-                                                           "volumePaneSize": "medium",
-                                  "MACDPaneSize": "tiny",                       
-                                                                 },              
-         //设置初始化加载条样式                         loading_screen: {        
-                              "backgroundColor": "#1e222d",                      
-                "foregroundColor": "#5d7d93"                },                   
-           studies_overrides: {                                     //设置成交量默认样式
-                                  "volume.volume.color.0": "rgba(174,78,84,0.7)",
-                                  "volume.volume.color.1": "rgba(88,144,101,0.7)",
-                              }                     })                     this.symbol
-      = symbol                     this.interval = interval                     var
-      thats = this.widgets;                     this.widgets.onChartReady(function()
-      {                         //设置均线种类 均线样式                         thats.chart().createStudy('Moving
-      Average', false, false, [5], null, {'Plot.color': 'rgb(150, 95, 196)'});   
-                           thats.chart().createStudy('Moving Average', false, false,
-      [10], null, {'Plot.color': 'rgb(116,149,187)'});                         thats.chart().createStudy('Moving
-      Average', false, false, [20],null,{"plot.color": "rgb(58,113,74)"});       
-                       thats.chart().createStudy('Moving Average', false, false,
-      [30],null,{"plot.color": "rgb(118,32,99)"});                         //设置自定义按钮种类
-      样式  事件                         thats.createButton()                   
-               .attr('title', "1min").addClass("mydate")                           
-       .text("1min")                             .on('click', function(e) {       
-                           $(this).parent().siblings().children().removeClass("clickBtn");
-                                  $(this).parent().siblings().children().addClass("mydate");
-                                  $(this).removeClass("mydate");                   
-               $(this).addClass("clickBtn");                             thats.chart().setResolution('1',
-      function onReadyCallback() {});                             });           
-                   thats.createButton().addClass("clickBtn")                       
-           .attr('title', "5min")                             .text("5min")       
-                           .on('click', function(e) {                           
-               $(this).parent().siblings().children().removeClass("clickBtn");   
-                               $(this).parent().siblings().children().addClass("mydate");
-                                  $(this).removeClass("mydate");                   
-               $(this).addClass("clickBtn");                             thats.chart().setResolution('5',
-      function onReadyCallback() {});                             });           
-                   thats.createButton().addClass("mydate")                       
-           .attr('title', "15min")                             .text("15min")   
-                               .on('click', function(e) {                       
-                   $(this).parent().siblings().children().removeClass("clickBtn");
-                                  $(this).parent().siblings().children().addClass("mydate");
-                                  $(this).removeClass("mydate");                   
-               $(this).addClass("clickBtn");                             thats.chart().setResolution('15',
-      function onReadyCallback() {});                             });           
-                   thats.createButton().addClass("mydate")                       
-           .attr('title', "30min")                             .text("30min")   
-                               .css("background-color", "#4e5b85")               
-                   .on('click', function(e) {                                   
-       $(this).parent().siblings().children().removeClass("clickBtn");           
-                       $(this).parent().siblings().children().addClass("mydate");
-                                  $(this).removeClass("mydate");                   
-               $(this).addClass("clickBtn");                             thats.chart().setResolution('30',
-      function onReadyCallback() {});                             });           
-                   thats.createButton().addClass("mydate")                       
-           .attr('title', "1hour")                             .text("1hour")   
-                               .on('click', function(e) {                       
-                   $(this).parent().siblings().children().removeClass("clickBtn");
-                                  $(this).parent().siblings().children().addClass("mydate");
-                                  $(this).removeClass("mydate");                   
-               $(this).addClass("clickBtn");                             thats.chart().setResolution('60',
-      function onReadyCallback() {});                             });           
-                   thats.createButton().addClass("mydate")                       
-           .attr('title', "4hour")                             .text("4hour")   
-                               .on('click', function(e) {                       
-                   $(this).parent().siblings().children().removeClass("clickBtn");
-                                  $(this).parent().siblings().children().addClass("mydate");
-                                  $(this).removeClass("mydate");                   
-               $(this).addClass("clickBtn");                             thats.chart().setResolution('240',
-      function onReadyCallback() {});                             });           
-                                            thats.createButton().addClass("mydate")
-                                  .attr('title', "1day")                           
-       .text("1day")                             .on('click', function(e) {       
-                                   $(this).parent().siblings().children().removeClass("clickBtn");
-                                  $(this).parent().siblings().children().addClass("mydate");
-                                  $(this).removeClass("mydate");                   
-               $(this).addClass("clickBtn");                             thats.chart().setResolution('1D',
-      function onReadyCallback() {});                             });           
-                   thats.createButton().addClass("mydate")                       
-           .attr('title', "5day")                             .text("5day")       
-                           .on('click', function(e) {                           
-               $(this).parent().siblings().children().removeClass("clickBtn");   
-                               $(this).parent().siblings().children().addClass("mydate");
-                                  $(this).removeClass("mydate");                   
-               $(this).addClass("clickBtn");                             thats.chart().setResolution('5D',
-      function onReadyCallback() {});                             });           
-                   thats.createButton().addClass("mydate")                       
-           .attr('title', "1week")                             .text("1week")   
-                               .on('click', function(e) {                       
-                   $(this).parent().siblings().children().removeClass("clickBtn");
-                                  $(this).parent().siblings().children().addClass("mydate");
-                                  $(this).removeClass("mydate");                   
-               $(this).addClass("clickBtn");                             thats.chart().setResolution('1W',
-      function onReadyCallback() {});                             });           
-                   thats.createButton().addClass("mydate")                       
-           .attr('title', "1mon")                             .text("1mon")       
-                           .on('click', function(e) {                           
-               $(this).parent().siblings().children().removeClass("clickBtn");   
-                               $(this).parent().siblings().children().addClass("mydate");
-                                  $(this).removeClass("mydate");                   
-               $(this).addClass("clickBtn");                             thats.chart().setResolution('1M',
-      function onReadyCallback() {});                             });           
-                   })                 }             }             TVjsApi.prototype.sendMessage
-      = function(data) {                 var that = this;                 console.log("这是要发送的数据："+JSON.stringify(data)
-      )                 if (this.socket.checkOpen()) {                     this.socket.send(data)
-                      } else {                     this.socket.on('open', function()
-      {                         that.socket.send(data)                     })   
-                   }             }             TVjsApi.prototype.unSubscribe = function(interval)
-      {                 if (interval < 60) {                     this.sendMessage({
-                              cmd: 'unsub',                         args: ["candle.M"
-      + interval + "." + this.symbol.toLowerCase(), 1440, parseInt(Date.now() / 1000)]
-                          })                 } else if (interval >= 60) {       
-                   this.sendMessage({                         cmd: 'unsub',       
-                       args: ["candle.H" + (interval / 60) + "." + this.symbol.toLowerCase(),
-      1440, parseInt(Date.now() / 1000)]                     })                 }
-      else {                     this.sendMessage({                         cmd:
-      'unsub',                         args: ["candle.D1." + this.symbol.toLowerCase(),
-      207, parseInt(Date.now() / 1000)]                     })                 }
-                  }             TVjsApi.prototype.subscribe = function() {       
-               if (this.interval < 60) {                     this.sendMessage({   
-                           cmd: 'sub',                         args: ["candle.M"
-      + this.interval + "." + this.symbol.toLowerCase()]                     })   
-                   } else if (this.interval >= 60) {                     this.sendMessage({
-                              cmd: 'sub',                         args: ["candle.H"
-      + (this.interval / 60) + "." + this.symbol.toLowerCase()]                   
-       })                 } else {                     this.sendMessage({       
-                       cmd: 'sub',                         args: ["candle.D1." +
-      this.symbol.toLowerCase()]                     })                 }       
-           }             TVjsApi.prototype.onMessage = function(data) {           
-           var thats = this.TVjsApi;                 count++;                 if(count<15){
-                          console.log("这是后台返回的数据"+count+"："+JSON.stringify(data)
-      )                 }                                  if (data.data && data.data.length)
-      {                     var list = []                     var ticker = thats.symbol
-      + "-" + thats.interval;                     var that = thats;               
-           data.data.forEach(function(element) {                         list.push({
-                                  time: that.interval !== 'D' || that.interval !==
-      '1D' ? element.id * 1000 : element.id,                             open: element.open,
-                                  high: element.high,                           
-       low: element.low,                             close: element.close,       
-                           volume: element.quote_vol                         })   
-                       }, that)                     thats.cacheData[ticker] = list
-                          thats.lastTime = list[list.length - 1].time           
-               thats.subscribe()                 }                 if (data.type
-      && data.type.indexOf(thats.symbol.toLowerCase()) !== -1) {                   
-       // console.log(' >> sub:', data.type)                     thats.datafeeds.barsUpdater.updateData()
-                          var ticker = thats.symbol + "-" + thats.interval;       
-                   var barsData = {                         time: data.id * 1000,
-                              open: data.open,                         high: data.high,
-                              low: data.low,                         close: data.close,
-                              volume: data.quote_vol                     }       
-                   if (barsData.time >= thats.lastTime && thats.cacheData[ticker]
-      && thats.cacheData[ticker].length) {                         thats.cacheData[ticker][thats.cacheData[ticker].length
-      - 1] = barsData                     }                 }             }       
-           TVjsApi.prototype.getBars = function(symbolInfo, resolution, rangeStartDate,
-      rangeEndDate, onLoadedCallback) {                 // console.log(' >> :', rangeStartDate,
-      rangeEndDate)                 if (this.interval !== resolution) {           
-               this.unSubscribe(this.interval)                     this.interval
-      = resolution                     if (resolution < 60) {                   
-           this.sendMessage({                             cmd: 'req',           
-                       args: ["candle.M" + this.interval + "." + this.symbol.toLowerCase(),
-      1440, parseInt(Date.now() / 1000)]                         })               
-           } else if (resolution >= 60) {                         this.sendMessage({
-                                  cmd: 'req',                             args: ["candle.H"
-      + (this.interval / 60) + "." + this.symbol.toLowerCase(), 1440, parseInt(Date.now()
-      / 1000)]                         })                     } else {           
-                   this.sendMessage({                             cmd: 'req',   
-                               args: ["candle.D1." + this.symbol.toLowerCase(), 800,
-      parseInt(Date.now() / 1000)]                         })                   
-       }                 }                 var ticker = this.symbol + "-" + this.interval
-                      if (this.cacheData[ticker] && this.cacheData[ticker].length)
-      {                     this.isLoading = false                     var newBars
-      = []                     this.cacheData[ticker].forEach(item => {           
-                   if (item.time >= rangeStartDate * 1000 && item.time <= rangeEndDate
-      * 1000) {                             newBars.push(item)                   
-           }                     })                     onLoadedCallback(newBars)
-                      } else {                     var self = this               
-           this.getBarTimer = setTimeout(function() {                         self.getBars(symbolInfo,
-      resolution, rangeStartDate, rangeEndDate, onLoadedCallback)               
-           }, 10)                 }             }             var TVjsApi = new TVjsApi();
-                  TVjsApi.init()         
-    </script>
-         
-  </body>
+</head>
+
+<body>
+<div id="trade-view"></div>
+<script src="static/tradeview/charting_library/charting_library.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/dataUpdater.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="js/datafees.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="js/socket.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+
+<script>
+    var count = 0;
+
+    function TVjsApi() { //
+        var urls = 'ws://*****'; //    var urls = 'ws://****/trade_market/websocket/btc_usdt'
+        var urls = 'wss://api.fcoin.com/v2/ws';
+        this.widgets
+            = null;
+        this.socket = new socket(urls); //    this.socket
+        // this.socket = new socket();
+        this.datafeeds = new datafeeds(this);
+        this.symbol = null, this.interval = null,
+            this.cacheData = {}, this.lastTime = null,
+            this.getBarTimer = null, this.isLoading
+            = true;
+        var that = this;
+        this.socket.doOpen()
+        this.socket.on('open', function () {
+            that.socket.send({
+                cmd: 'req', args: ["candle.M5.ethusdt",
+                    150, parseInt(Date.now() / 1000)]
+            })
+        })
+        this.socket.on('message', that.onMessage)
+    }
+
+    TVjsApi.prototype.init = function () {     //设置默认symbol，interval的默认值
+        var symbol = arguments.length > 0 && arguments[0] !== undefined
+            ? arguments[0] : 'ethusdt';
+        var interval = arguments.length
+        > 0 && arguments[1] !== undefined ? arguments[1] : 5;
+        if (!this.widgets) {
+            this.widgets = window.tvWidget = new TradingView.widget({
+                    //默认商品设置       symbol: symbol,
+                    //默认请求间隔       interval: interval,
+                    //默认是否全屏       // fullscreen:
+                    autosize: true,       //默认是否自适应       // autosize:true,
+                    //设置容器       container_id:
+                    container_id: 'trade-view',
+                    datafeed: this.datafeeds,
+                    library_path: './static/tradeview/charting_library/',
+                    enabled_features: [],
+                    timezone: 'Asia/Shanghai', locale: 'zh',
+                    debug: false,       //设置默认工具条背景颜色
+                    toolbar_bg: "#121A2E",       //设置默认不显示组件
+                    disabled_features: ['header_symbol_search',
+                        "use_localstorage_for_settings",
+                        "left_toolbar", 'legend_context_menu',
+                        "border_around_the_chart",
+                        "timeframes_toolbar", "volume_force_overlay",
+                        "pane_context_menu",
+                        "header_symbol_search", "symbol_search_hot_key",
+                        "header_undo_redo",
+                        "header_compare", "header_chart_type",
+                        "header_screenshot", "header_resolutions",
+                        // "header_settings",
+                        // "header_indicators"
+                    ],       //设置初始化样式配置
+                    overrides:
+                        {
+                            "mainSeriesProperties.candleStyle.upColor":
+                                "#589065", "mainSeriesProperties.candleStyle.downColor":
+                                "#AE4E54", "mainSeriesProperties.candleStyle.drawWick":
+                                true, "mainSeriesProperties.candleStyle.wickUpColor:":
+                                '#AE4E54', "mainSeriesProperties.candleStyle.wickDownColor":
+                                "#AE4E54", "mainSeriesProperties.candleStyle.drawBorder":
+                                true, "mainSeriesProperties.candleStyle.borderUpColor":
+                                "#589065", "mainSeriesProperties.candleStyle.borderDownColor":
+                                "#AE4E54",        //-----------------------------------------------------------------------
+                            "paneProperties.background":
+                                "#121a2e",
+                            "paneProperties.vertGridProperties.color":
+                                "#1e273c",
+                            "paneProperties.vertGridProperties.style":
+                                0,
+                            "paneProperties.horzGridProperties.color":
+                                "#1e273c",
+                            "paneProperties.horzGridProperties.style":
+                                0,
+                            "scalesProperties.lineColor":
+                                "#505d7b",
+                            "scalesProperties.textColor":
+                                "#333e58",
+                            "paneProperties.legendProperties.showLegend":
+                                false,        //"scalesProperties.showLeftScale":false,
+                            "volumePaneSize":
+                                "medium",
+                            "MACDPaneSize":
+                                "tiny",
+                        }
+                    ,
+                    //设置初始化加载条样式
+                    loading_screen: {
+                        "backgroundColor":
+                            "#1e222d",
+                        "foregroundColor":
+                            "#5d7d93"
+                    },
+                    studies_overrides:
+                        {          //设置成交量默认样式
+                            "volume.volume.color.0":
+                                "rgba(174,78,84,0.7)",
+                            "volume.volume.color.1":
+                                "rgba(88,144,101,0.7)",
+                        }
+                }
+            )
+            this.symbol
+                = symbol
+            this.interval = interval
+            var
+                thats = this.widgets;
+            this.widgets.onChartReady(function () {       //设置均线种类 均线样式
+                thats.chart().createStudy('Moving Average', false, false, [5], null, {'Plot.color': 'rgb(150, 95, 196)'});
+                thats.chart().createStudy('Moving Average', false, false,
+                    [10], null, {'Plot.color': 'rgb(116,149,187)'});
+                thats.chart().createStudy('Moving Average', false, false, [20], null, {"plot.color": "rgb(58,113,74)"});
+                thats.chart().createStudy('Moving Average', false, false,
+                    [30], null, {"plot.color": "rgb(118,32,99)"});       //设置自定义按钮种类
+                // 样式
+                // 事件
+                thats.createButton()
+                    .attr('title', "1min").addClass("mydate")
+                    .text("1min").on('click', function (e) {
+                    $(this).parent().siblings().children().removeClass("clickBtn");
+                    $(this).parent().siblings().children().addClass("mydate");
+                    $(this).removeClass("mydate");
+                    $(this).addClass("clickBtn");
+                    thats.chart().setResolution('1',
+                        function onReadyCallback() {
+                        });
+                });
+                thats.createButton().addClass("clickBtn")
+                    .attr('title', "5min").text("5min")
+                    .on('click', function (e) {
+                        $(this).parent().siblings().children().removeClass("clickBtn");
+                        $(this).parent().siblings().children().addClass("mydate");
+                        $(this).removeClass("mydate");
+                        $(this).addClass("clickBtn");
+                        thats.chart().setResolution('5',
+                            function onReadyCallback() {
+                            });
+                    });
+                thats.createButton().addClass("mydate")
+                    .attr('title', "15min").text("15min")
+                    .on('click', function (e) {
+                        $(this).parent().siblings().children().removeClass("clickBtn");
+                        $(this).parent().siblings().children().addClass("mydate");
+                        $(this).removeClass("mydate");
+                        $(this).addClass("clickBtn");
+                        thats.chart().setResolution('15',
+                            function onReadyCallback() {
+                            });
+                    });
+                thats.createButton().addClass("mydate")
+                    .attr('title', "30min").text("30min")
+                    .css("background-color", "#4e5b85")
+                    .on('click', function (e) {
+                        $(this).parent().siblings().children().removeClass("clickBtn");
+                        $(this).parent().siblings().children().addClass("mydate");
+                        $(this).removeClass("mydate");
+                        $(this).addClass("clickBtn");
+                        thats.chart().setResolution('30',
+                            function onReadyCallback() {
+                            });
+                    });
+                thats.createButton().addClass("mydate")
+                    .attr('title', "1hour").text("1hour")
+                    .on('click', function (e) {
+                        $(this).parent().siblings().children().removeClass("clickBtn");
+                        $(this).parent().siblings().children().addClass("mydate");
+                        $(this).removeClass("mydate");
+                        $(this).addClass("clickBtn");
+                        thats.chart().setResolution('60',
+                            function onReadyCallback() {
+                            });
+                    });
+                thats.createButton().addClass("mydate")
+                    .attr('title', "4hour").text("4hour")
+                    .on('click', function (e) {
+                        $(this).parent().siblings().children().removeClass("clickBtn");
+                        $(this).parent().siblings().children().addClass("mydate");
+                        $(this).removeClass("mydate");
+                        $(this).addClass("clickBtn");
+                        thats.chart().setResolution('240',
+                            function onReadyCallback() {
+                            });
+                    });
+                thats.createButton().addClass("mydate")
+                    .attr('title', "1day")
+                    .text("1day").on('click', function (e) {
+                    $(this).parent().siblings().children().removeClass("clickBtn");
+                    $(this).parent().siblings().children().addClass("mydate");
+                    $(this).removeClass("mydate");
+                    $(this).addClass("clickBtn");
+                    thats.chart().setResolution('1D',
+                        function onReadyCallback() {
+                        });
+                });
+                thats.createButton().addClass("mydate")
+                    .attr('title', "5day").text("5day")
+                    .on('click', function (e) {
+                        $(this).parent().siblings().children().removeClass("clickBtn");
+                        $(this).parent().siblings().children().addClass("mydate");
+                        $(this).removeClass("mydate");
+                        $(this).addClass("clickBtn");
+                        thats.chart().setResolution('5D',
+                            function onReadyCallback() {
+                            });
+                    });
+                thats.createButton().addClass("mydate")
+                    .attr('title', "1week").text("1week")
+                    .on('click', function (e) {
+                        $(this).parent().siblings().children().removeClass("clickBtn");
+                        $(this).parent().siblings().children().addClass("mydate");
+                        $(this).removeClass("mydate");
+                        $(this).addClass("clickBtn");
+                        thats.chart().setResolution('1W',
+                            function onReadyCallback() {
+                            });
+                    });
+                thats.createButton().addClass("mydate")
+                    .attr('title', "1mon").text("1mon")
+                    .on('click', function (e) {
+                        $(this).parent().siblings().children().removeClass("clickBtn");
+                        $(this).parent().siblings().children().addClass("mydate");
+                        $(this).removeClass("mydate");
+                        $(this).addClass("clickBtn");
+                        thats.chart().setResolution('1M',
+                            function onReadyCallback() {
+                            });
+                    });
+            })
+        }
+    }
+    TVjsApi.prototype.sendMessage
+        = function (data) {
+        var that = this;
+        console.log("这是要发送的数据：" + JSON.stringify(data)
+        )
+        if (this.socket.checkOpen()) {
+            this.socket.send(data)
+        } else {
+            this.socket.on('open', function () {
+                that.socket.send(data)
+            })
+        }
+    }
+    TVjsApi.prototype.unSubscribe = function (interval) {
+        if (interval < 60) {
+            this.sendMessage({
+                cmd: 'unsub', args: ["candle.M"
+                + interval + "." + this.symbol.toLowerCase(), 1440, parseInt(Date.now() / 1000)]
+            })
+        } else if (interval >= 60) {
+            this.sendMessage({
+                cmd: 'unsub',
+                args: ["candle.H" + (interval / 60) + "." + this.symbol.toLowerCase(),
+                    1440, parseInt(Date.now() / 1000)]
+            })
+        } else {
+            this.sendMessage({
+                cmd:
+                    'unsub', args: ["candle.D1." + this.symbol.toLowerCase(),
+                    207, parseInt(Date.now() / 1000)]
+            })
+        }
+    }
+    TVjsApi.prototype.subscribe = function () {
+        if (this.interval < 60) {
+            this.sendMessage({
+                cmd: 'sub', args: ["candle.M"
+                + this.interval + "." + this.symbol.toLowerCase()]
+            })
+        } else if (this.interval >= 60) {
+            this.sendMessage({
+                cmd: 'sub', args: ["candle.H"
+                + (this.interval / 60) + "." + this.symbol.toLowerCase()]
+            })
+        } else {
+            this.sendMessage({
+                cmd: 'sub', args: ["candle.D1." +
+                this.symbol.toLowerCase()]
+            })
+        }
+    }
+    TVjsApi.prototype.onMessage = function (data) {
+        var thats = this.TVjsApi;
+        count++;
+        if (count < 15) {
+            console.log("这是后台返回的数据" + count + "：" + JSON.stringify(data)
+            )
+        }
+        if (data.data && data.data.length) {
+            var list = []
+            var ticker = thats.symbol
+                + "-" + thats.interval;
+            var that = thats;
+            data.data.forEach(function (element) {
+                list.push({
+                    time: that.interval !== 'D' || that.interval !==
+                    '1D' ? element.id * 1000 : element.id, open: element.open,
+                    high: element.high,
+                    low: element.low, close: element.close,
+                    volume: element.quote_vol
+                })
+            }, that)
+            thats.cacheData[ticker] = list
+            thats.lastTime = list[list.length - 1].time
+            thats.subscribe()
+        }
+        if (data.type
+            && data.type.indexOf(thats.symbol.toLowerCase()) !== -1) {
+            // console.log(' >> sub:', data.type)      thats.datafeeds.barsUpdater.updateData()
+            var ticker = thats.symbol + "-" + thats.interval;
+            var barsData = {
+                time: data.id * 1000,
+                open: data.open, high: data.high,
+                low: data.low, close: data.close,
+                volume: data.quote_vol
+            }
+            if (barsData.time >= thats.lastTime && thats.cacheData[ticker]
+                && thats.cacheData[ticker].length) {
+                thats.cacheData[ticker][thats.cacheData[ticker].length
+                - 1] = barsData
+            }
+        }
+    }
+    TVjsApi.prototype.getBars = function (symbolInfo, resolution, rangeStartDate,
+                                          rangeEndDate, onLoadedCallback) {     //
+        console.log(' >> :', rangeStartDate, rangeEndDate)
+        if (this.interval !== resolution) {
+            this.unSubscribe(this.interval)
+            this.interval
+                = resolution
+            if (resolution < 60) {
+                this.sendMessage({
+                    cmd: 'req',
+                    args: ["candle.M" + this.interval + "." + this.symbol.toLowerCase(),
+                        1440, parseInt(Date.now() / 1000)]
+                })
+            } else if (resolution >= 60) {
+                this.sendMessage({
+                    cmd: 'req', args: ["candle.H"
+                    + (this.interval / 60) + "." + this.symbol.toLowerCase(), 1440, parseInt(Date.now()
+                        / 1000)]
+                })
+            } else {
+                this.sendMessage({
+                    cmd: 'req',
+                    args: ["candle.D1." + this.symbol.toLowerCase(), 800,
+                        parseInt(Date.now() / 1000)]
+                })
+            }
+        }
+        var ticker = this.symbol + "-" + this.interval
+        if (this.cacheData[ticker] && this.cacheData[ticker].length) {
+            this.isLoading = false
+            var newBars
+                = []
+            this.cacheData[ticker].forEach(item => {
+                if (item.time >= rangeStartDate * 1000 && item.time <= rangeEndDate
+                    * 1000) {
+                    newBars.push(item)
+                }
+            })
+            onLoadedCallback(newBars)
+        } else {
+            var self = this
+            this.getBarTimer = setTimeout(function () {
+                self.getBars(symbolInfo,
+                    resolution, rangeStartDate, rangeEndDate, onLoadedCallback)
+            }, 10)
+        }
+    }
+    var TVjsApi = new TVjsApi();
+    TVjsApi.init()
+</script>
+
+</body>
 
 </html>
 'use strict';
-
-function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
+<script>
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
     }
-}
-var socket = function () {
-    function socket() {
-        var url = arguments.length >
+
+    var socket = function () {
+        function socket() {
+            var url = arguments.length >
             0 && arguments[0] !== undefined ? arguments[0] : 'wss://api.fcoin.com/v2/ws';
-        var options = arguments[1];
-        _classCallCheck(this, socket);
-        this.heartBeatTimer = null;
-        this.options = options;
-        this.messageMap = {};
-        this.connState = 0;
-        this.socket = null;
-        this.url = url;
-    }
-    socket.prototype.doOpen =
-        function doOpen() {
-            var _this = this;
-            console.log("我被调用了") if (this.connState)
-                return;
-            this.connState = 1;
-            this.afterOpenEmit = [];
-            var BrowserWebSocket = window.WebSocket || window.MozWebSocket;
-            var socket = new BrowserWebSocket(this.url);
-            socket.binaryType = 'arraybuffer';
-            socket.onopen = function (evt) {
-                return _this.onOpen(evt);
-            };
-            socket.onclose = function (evt) {
-                return
-                _this.onClose(evt);
-            };
-            socket.onmessage = function (evt) {
-                return _this.onMessage(evt.data);
-            };
-            socket.onerror = function (err) {
-                return _this.onError(err);
-            };
-            this.socket = socket;
-        };
-    socket.prototype.onOpen = function onOpen(evt) {
-        this.connState = 2;
-        this.heartBeatTimer = setInterval(this.checkHeartbeat.bind(this),
-            20000);
-        this.onReceiver({
-            Event: 'open'
-        });
-    };
-    socket.prototype.checkOpen = function checkOpen() {
-        return this.connState === 2;
-    };
-    socket.prototype.onClose = function onClose() {
-        this.connState = 0;
-        if (this.connState) {
-            this.onReceiver({
-                Event: 'close'
-            });
-        }
-    };
-    socket.prototype.send = function send(data) {
-        this.socket.send(JSON.stringify(data));
-    };
-    socket.prototype.emit = function emit(data) {
-        var _this2 = this;
-        return new Promise(function (resolve) {
-            _this2.socket.send(JSON.stringify(data));
-            _this2.on('message', function (data) {
-                resolve(data);
-            });
-        });
-    };
-    socket.prototype.onMessage = function onMessage(message) {
-        try {
-            var data = JSON.parse(message);
-            this.onReceiver({
-                Event: 'message',
-                Data: data
-            });
-        } catch (err) {
-            console.error(' >> Data parsing error:', err);
-        }
-    };
-    socket.prototype.checkHeartbeat = function checkHeartbeat() {
-        var
-            data = {
-                'cmd': 'ping',
-                'args': [Date.parse(new Date())]
-            };
-        this.send(data);
-    };
-    socket.prototype.onError = function onError(err) {};
-    socket.prototype.onReceiver = function onReceiver(data) {
-        var callback = this.messageMap[data.Event];
-        if (callback) callback(data.Data);
-    };
-    socket.prototype.on = function on(name,
-        handler) {
-        this.messageMap[name] = handler;
-    };
-    socket.prototype.doClose =
-        function doClose() {
-            this.socket.close();
-        };
-    socket.prototype.destroy = function
-    destroy() {
-        if (this.heartBeatTimer) {
-            clearInterval(this, this.heartBeatTimer);
+            var options = arguments[1];
+            _classCallCheck(this, socket);
             this.heartBeatTimer = null;
+            this.options = options;
+            this.messageMap = {};
+            this.connState = 0;
+            this.socket = null;
+            this.url = url;
         }
-        this.doClose();
-        this.messageMap = {};
-        this.connState = 0;
-        this.socket = null;
-    };
-    return socket;
-}();
 
-<!-- datafees.js部分： -->
-'use strict';
-var _dataUpdater2 = _interopRequireDefault(dataUpdater);
-
-function
-_interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-        default: obj
-    };
-}
-
-function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
-    }
-}
-/**
-                                                                                 
-                                                                         * JS API
-                                                                                 
-                                                                         */
-var datafeeds = function () {
-    /**    * JS API    * @param {*Object} vue vue实例    */
-    function
-    datafeeds(vue) {
-        _classCallCheck(this, datafeeds);
-        this.self = vue;
-        this.barsUpdater = new _dataUpdater2.default(this);
-    }
-    /**    * @param {*Function} callback  回调函数
-     * `onReady` should return result asynchronously.    */
-    datafeeds.prototype.onReady = function onReady(callback) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            var configuration = _this.defaultConfiguration();
-            if (_this.self.getConfig) {
-                configuration = Object.assign(_this.defaultConfiguration(),
-                    _this.self.getConfig());
+        socket.prototype.doOpen =
+            function doOpen() {
+                var _this = this;
+                console.log("我被调用了")
+                if (this.connState)
+                    return;
+                this.connState = 1;
+                this.afterOpenEmit = [];
+                var BrowserWebSocket = window.WebSocket || window.MozWebSocket;
+                var socket = new BrowserWebSocket(this.url);
+                socket.binaryType = 'arraybuffer';
+                socket.onopen = function (evt) {
+                    return _this.onOpen(evt);
+                };
+                socket.onclose = function (evt) {
+                    return
+                    _this.onClose(evt);
+                };
+                socket.onmessage = function (evt) {
+                    return _this.onMessage(evt.data);
+                };
+                socket.onerror = function (err) {
+                    return _this.onError(err);
+                };
+                this.socket = socket;
+            };
+        socket.prototype.onOpen = function onOpen(evt) {
+            this.connState = 2;
+            this.heartBeatTimer = setInterval(this.checkHeartbeat.bind(this),
+                20000);
+            this.onReceiver({
+                Event: 'open'
+            });
+        };
+        socket.prototype.checkOpen = function checkOpen() {
+            return this.connState === 2;
+        };
+        socket.prototype.onClose = function onClose() {
+            this.connState = 0;
+            if (this.connState) {
+                this.onReceiver({
+                    Event: 'close'
+                });
             }
-            resolve(configuration);
-        }).then(function (data) {
-            return callback(data);
-        });
-    };
-    /**    * @param {*String} symbolName
- 商品名称或ticker    * @param {*Function} onSymbolResolvedCallback 成功回调     *
-@param {*Function} onResolveErrorCallback   失败回调    * `resolveSymbol` should
-return result asynchronously.    */
-    datafeeds.prototype.resolveSymbol = function
-    resolveSymbol(symbolName, onSymbolResolvedCallback, onResolveErrorCallback) {
-        var _this2 = this;
-        return new Promise(function (resolve, reject) {
+        };
+        socket.prototype.send = function send(data) {
+            this.socket.send(JSON.stringify(data));
+        };
+        socket.prototype.emit = function emit(data) {
+            var _this2 = this;
+            return new Promise(function (resolve) {
+                _this2.socket.send(JSON.stringify(data));
+                _this2.on('message', function (data) {
+                    resolve(data);
+                });
+            });
+        };
+        socket.prototype.onMessage = function onMessage(message) {
+            try {
+                var data = JSON.parse(message);
+                this.onReceiver({
+                    Event: 'message',
+                    Data: data
+                });
+            } catch (err) {
+                console.error(' >> Data parsing error:', err);
+            }
+        };
+        socket.prototype.checkHeartbeat = function checkHeartbeat() {
             var
-                symbolInfo = _this2.defaultSymbol();
-            if (_this2.self.getSymbol) {
-                symbolInfo
-                    = Object.assign(_this2.defaultSymbol(), _this2.self.getSymbol());
+                data = {
+                    'cmd': 'ping',
+                    'args': [Date.parse(new Date())]
+                };
+            this.send(data);
+        };
+        socket.prototype.onError = function onError(err) {
+        };
+        socket.prototype.onReceiver = function onReceiver(data) {
+            var callback = this.messageMap[data.Event];
+            if (callback) callback(data.Data);
+        };
+        socket.prototype.on = function on(name,
+                                          handler) {
+            this.messageMap[name] = handler;
+        };
+        socket.prototype.doClose =
+            function doClose() {
+                this.socket.close();
+            };
+        socket.prototype.destroy = function
+            destroy() {
+            if (this.heartBeatTimer) {
+                clearInterval(this, this.heartBeatTimer);
+                this.heartBeatTimer = null;
             }
-            resolve(symbolInfo);
-        }).then(function (data) {
-            return onSymbolResolvedCallback(data);
-        }).catch(function (err) {
-            return onResolveErrorCallback(err);
-        });
-    };
-    /**    * @param
-{*Object} symbolInfo  商品信息对象    * @param {*String} resolution  分辨率    *
-@param {*Number} rangeStartDate  时间戳、最左边请求的K线时间    * @param {*Number}
-rangeEndDate  时间戳、最右边请求的K线时间    * @param {*Function} onDataCallback
- 回调函数    * @param {*Function} onErrorCallback  回调函数    */
-    datafeeds.prototype.getBars = function getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate,
-        onDataCallback,
-        onErrorCallback) {
-        var onLoadedCallback = function onLoadedCallback(data) {
-            if (data && LastLength != data.length) {
-                onDataCallback(data, {
-                    noData: false
-                });
-            } else {
-                onDataCallback([], {
-                    noData: true
-                });
-            }
-            LastLength = data.length;
-            //或者可以这样写：       data && data.length ? onDataCallback(data, { noData: true
-        }): onDataCallback([], {
-        noData: true
-    });
-};
-this.self.getBars(symbolInfo,
-    resolution, rangeStartDate, rangeEndDate, onLoadedCallback);
-};
-/**    * 订阅K线数据。图表库将调用onRealtimeCallback方法以更新实时数据
-   * @param {*Object} symbolInfo 商品信息    * @param {*String} resolution 分辨率
-   * @param {*Function} onRealtimeCallback 回调函数     * @param {*String} subscriberUID
-监听的唯一标识符    * @param {*Function} onResetCacheNeededCallback (从1.7开始):
-将在bars数据发生变化时执行    */
-datafeeds.prototype.subscribeBars = function subscribeBars(symbolInfo,
-    resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) {
-    this.barsUpdater.subscribeBars(symbolInfo, resolution, onRealtimeCallback, subscriberUID,
-        onResetCacheNeededCallback);
-};
-/**    * 取消订阅K线数据    * @param {*String}
-subscriberUID 监听的唯一标识符    */
-datafeeds.prototype.unsubscribeBars = function
-unsubscribeBars(subscriberUID) {
-    this.barsUpdater.unsubscribeBars(subscriberUID);
-}; /**    * 默认配置    */
-datafeeds.prototype.defaultConfiguration = function
-defaultConfiguration() { //设置默认配置     return {       supports_search:
-    false,
-    supports_group_request: false,
-    supported_resolutions: ['1', '5',
-'15', '30', '60', '240', '1D', '5D', '1W', '1M'],
-    supports_marks: true,
-    supports_timescale_marks: true,
-    supports_time: true
-};
-};
-/**    *
-默认商品信息    */
-datafeeds.prototype.defaultSymbol = function defaultSymbol() {
-    return {
-        'name': 'BTCUSDT',
-        'timezone': 'Asia/Shanghai',
-        'minmov': 1,
-        'minmov2': 0,
-        'pointvalue': 1,
-        'fractional': false,
-        //设置周期       'session': '24x7',       'has_intraday': true,       'has_no_volume':
-        false, //设置是否支持周月线        "has_daily":true,        //设置是否支持周月线
-        "has_weekly_and_monthly": true,
-        'description': 'BTCUSDT', //设置精度 
-        100 表示保留两位小数 1000 三位 10000 四位 'pricescale': 100,
-        'ticker': 'BTCUSDT',
-        'supported_resolutions': ['1', '5', '15', '30', '60', '240', '1D',
-'5D', '1W', '1M']
-    };
-};
-return datafeeds;
-}();
-//  dataUpdater.js部分： 
-'use strict';
+            this.doClose();
+            this.messageMap = {};
+            this.connState = 0;
+            this.socket = null;
+        };
+        return socket;
+    }();
 
-function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
+    <!-- datafees.js部分： -->
+    'use strict';
+    var _dataUpdater2 = _interopRequireDefault(dataUpdater);
+
+    function
+    _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : {
+            default: obj
+        };
     }
-}
-/**
- * 数据更新器  * 通过更新器触发datafeeds的getBars实时更新图表数据  */
-var dataUpdater = function () {
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    /**
+     * JS API
+     */
+    var datafeeds = function () {
+        /**    * JS API    * @param {*Object} vue vue实例    */
+        function
+        datafeeds(vue) {
+            _classCallCheck(this, datafeeds);
+            this.self = vue;
+            this.barsUpdater = new _dataUpdater2.default(this);
+        }
+
+        /**    * @param {*Function} callback  回调函数
+         * `onReady` should return result asynchronously.    */
+        datafeeds.prototype.onReady = function onReady(callback) {
+            var _this = this;
+            return new Promise(function (resolve, reject) {
+                var configuration = _this.defaultConfiguration();
+                if (_this.self.getConfig) {
+                    configuration = Object.assign(_this.defaultConfiguration(),
+                        _this.self.getConfig());
+                }
+                resolve(configuration);
+            }).then(function (data) {
+                return callback(data);
+            });
+        };
+        /**    * @param {*String} symbolName
+         商品名称或ticker    * @param {*Function} onSymbolResolvedCallback 成功回调     *
+         @param {*Function} onResolveErrorCallback   失败回调    * `resolveSymbol` should
+          return result asynchronously.    */
+        datafeeds.prototype.resolveSymbol = function
+            resolveSymbol(symbolName, onSymbolResolvedCallback, onResolveErrorCallback) {
+            var _this2 = this;
+            return new Promise(function (resolve, reject) {
+                var
+                    symbolInfo = _this2.defaultSymbol();
+                if (_this2.self.getSymbol) {
+                    symbolInfo
+                        = Object.assign(_this2.defaultSymbol(), _this2.self.getSymbol());
+                }
+                resolve(symbolInfo);
+            }).then(function (data) {
+                return onSymbolResolvedCallback(data);
+            }).catch(function (err) {
+                return onResolveErrorCallback(err);
+            });
+        };
+        /**    * @param
+         {*Object} symbolInfo  商品信息对象    * @param {*String} resolution  分辨率    *
+         @param {*Number} rangeStartDate  时间戳、最左边请求的K线时间    * @param {*Number}
+          rangeEndDate  时间戳、最右边请求的K线时间    * @param {*Function} onDataCallback
+          回调函数    * @param {*Function} onErrorCallback  回调函数    */
+        datafeeds.prototype.getBars = function getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate,
+                                                       onDataCallback,
+                                                       onErrorCallback) {
+            var onLoadedCallback = function onLoadedCallback(data) {
+                if (data && LastLength != data.length) {
+                    onDataCallback(data, {
+                        noData: false
+                    });
+                } else {
+                    onDataCallback([], {
+                        noData: true
+                    });
+                }
+                LastLength = data.length;
+//或者可以这样写：       data && data.length ? onDataCallback(data, { noData: true
+            }
+        ):
+            onDataCallback([], {
+                noData: true
+            });
+        };
+        this.self.getBars(symbolInfo,
+            resolution, rangeStartDate, rangeEndDate, onLoadedCallback);
+    };
+    /**    * 订阅K线数据。图表库将调用onRealtimeCallback方法以更新实时数据
+     * @param {*Object} symbolInfo 商品信息    * @param {*String} resolution 分辨率
+     * @param {*Function} onRealtimeCallback 回调函数     * @param {*String} subscriberUID
+     监听的唯一标识符    * @param {*Function} onResetCacheNeededCallback (从1.7开始):
+     将在bars数据发生变化时执行    */
+    datafeeds.prototype.subscribeBars = function subscribeBars(symbolInfo,
+                                                               resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) {
+        this.barsUpdater.subscribeBars(symbolInfo, resolution, onRealtimeCallback, subscriberUID,
+            onResetCacheNeededCallback);
+    };
+    /**    * 取消订阅K线数据    * @param {*String}
+     subscriberUID 监听的唯一标识符    */
+    datafeeds.prototype.unsubscribeBars = function
+        unsubscribeBars(subscriberUID) {
+        this.barsUpdater.unsubscribeBars(subscriberUID);
+    };
+    /**    * 默认配置    */
+    datafeeds.prototype.defaultConfiguration = function
+        defaultConfiguration() { //设置默认配置     return {       supports_search:
+        false,
+            supports_group_request
+    :
+        false,
+            supported_resolutions
+    :
+        ['1', '5',
+            '15', '30', '60', '240', '1D', '5D', '1W', '1M'],
+            supports_marks
+    :
+        true,
+            supports_timescale_marks
+    :
+        true,
+            supports_time
+    :
+        true
+    };
+    }
+    ;
+    /**    *
+     默认商品信息    */
+    datafeeds.prototype.defaultSymbol = function defaultSymbol() {
+        return {
+            'name': 'BTCUSDT',
+            'timezone': 'Asia/Shanghai',
+            'minmov': 1,
+            'minmov2': 0,
+            'pointvalue': 1,
+            'fractional': false,
+//设置周期       'session': '24x7',       'has_intraday': true,       'has_no_volume':
+            false, //设置是否支持周月线        "has_daily":true,        //设置是否支持周月线
+            "has_weekly_and_monthly": true,
+            'description': 'BTCUSDT', //设置精度
+            100 表示保留两位小数 1000 三位 10000 四位 'pricescale': 100,
+            'ticker': 'BTCUSDT',
+            'supported_resolutions': ['1', '5', '15', '30', '60', '240', '1D',
+                '5D', '1W', '1M']
+        };
+    };
+    return datafeeds;
+    }
+    ();
+    //  dataUpdater.js部分：
+    'use strict';
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    /**
+     * 数据更新器  * 通过更新器触发datafeeds的getBars实时更新图表数据  */
+    var dataUpdater = function () {
         function dataUpdater(datafeeds) {
             _classCallCheck(this, dataUpdater);
             this.subscribers = {};
             this.requestsPending = 0;
             this.historyProvider = datafeeds;
         }
+
         dataUpdater.prototype.subscribeBars = function subscribeBars(symbolInfo,
-            resolution, newDataCallback, listenerGuid) {
+                                                                     resolution, newDataCallback, listenerGuid) {
             this.subscribers[listenerGuid] = {
                 lastBarTime: null,
                 listener: newDataCallback,
@@ -606,40 +746,46 @@ var dataUpdater = function () {
             });
         };
         dataUpdater.prototype.onSubscriberDataReceived = function onSubscriberDataReceived(listenerGuid,
-                bars) {
-                if (!this.subscribers.hasOwnProperty(listenerGuid)) return;
-                if (!bars.length)
-                    return;
-                var lastBar = bars[bars.length - 1];
-                var subscriptionRecord = this.subscribers[listenerGuid];
-                if (subscriptionRecord.lastBarTime !== null && lastBar.time < subscriptionRecord.lastBarTime)
-                    return;
-                var isNewBar = subscriptionRecord.lastBarTime !== null && lastBar.time >
-                    subscriptionRecord.lastBarTime;
-                if (isNewBar) {
-                    if (bars.length < 2) {
-                        throw new Error('Not enough bars in history for proper pulse update. Need
-                            at least 2. ');       }       var previousBar = bars[bars.length - 2];       subscriptionRecord.listener(previousBar);
-                        }
-                        subscriptionRecord.lastBarTime = lastBar.time;
-                        subscriptionRecord.listener(lastBar);
-                    };
-                    dataUpdater.prototype.periodLengthSeconds = function periodLengthSeconds(resolution,
-                        requiredPeriodsCount) {
-                        var daysCount = 0;
-                        if (resolution === 'D' || resolution ===
-                            '1D') {
-                            daysCount = requiredPeriodsCount;
-                        } else if (resolution ===
-                            'M' || resolution === '1M') {
-                            daysCount = 31 * requiredPeriodsCount;
-                        } else if (resolution === 'W' || resolution === '1W') {
-                            daysCount = 7 * requiredPeriodsCount;
-                        } else {
-                            daysCount = requiredPeriodsCount * parseInt(resolution) / (24 *
-                                60);
-                        }
-                        return daysCount * 24 * 60 * 60;
-                    };
-                    return dataUpdater;
-                }();
+                                                                                           bars) {
+            if (!this.subscribers.hasOwnProperty(listenerGuid)) return;
+            if (!bars.length)
+                return;
+            var lastBar = bars[bars.length - 1];
+            var subscriptionRecord = this.subscribers[listenerGuid];
+            if (subscriptionRecord.lastBarTime !== null && lastBar.time < subscriptionRecord.lastBarTime)
+                return;
+            var isNewBar = subscriptionRecord.lastBarTime !== null && lastBar.time >
+                subscriptionRecord.lastBarTime;
+            if (isNewBar) {
+                if (bars.length < 2) {
+                    throw new Error('Not enough bars in history for proper pulse update. Need
+                    at
+                    least
+                    2.
+                    ');       }       var previousBar = bars[bars.length - 2];       subscriptionRecord.listener(previousBar);
+                }
+                subscriptionRecord.lastBarTime = lastBar.time;
+                subscriptionRecord.listener(lastBar);
+            }
+            ;
+            dataUpdater.prototype.periodLengthSeconds = function periodLengthSeconds(resolution,
+                                                                                     requiredPeriodsCount) {
+                var daysCount = 0;
+                if (resolution === 'D' || resolution ===
+                    '1D') {
+                    daysCount = requiredPeriodsCount;
+                } else if (resolution ===
+                    'M' || resolution === '1M') {
+                    daysCount = 31 * requiredPeriodsCount;
+                } else if (resolution === 'W' || resolution === '1W') {
+                    daysCount = 7 * requiredPeriodsCount;
+                } else {
+                    daysCount = requiredPeriodsCount * parseInt(resolution) / (24 *
+                        60);
+                }
+                return daysCount * 24 * 60 * 60;
+            };
+            return dataUpdater;
+        }();
+
+</script>
