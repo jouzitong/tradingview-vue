@@ -2,7 +2,7 @@
  * @Author: kexiao 3493821365@qq.com
  * @Date: 2024-08-04 12:21:54
  * @LastEditors: kexiao 3493821365@qq.com
- * @LastEditTime: 2024-08-04 15:21:13
+ * @LastEditTime: 2024-11-02 16:19:21
  * @FilePath: /tradingview-vue/src/views/Home.vue
  * @Description: 
  * 

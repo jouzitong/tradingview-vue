@@ -1,0 +1,25 @@
+@borderColor: rgba(250,250,250,.4);
+.container{
+  height: calc(100vh - 48px);
+  min-height: calc(100vh - 52px);
+  border-top: 1px solid @borderColor;
+  overflow: hidden;
+  .container-main{
+    display: flex;
+    height: 100%;
+    overflow: auto;
+    justify-content: space-between;
+    .left{
+      min-width: 20%;
+      height: 100%;
+      // border-right: 1px solid @borderColor;
+    }
+    .main{
+      flex: 1;
+      // border-right: 1px solid @borderColor;
+    }
+    .right{
+      min-width: 20%;
+    }
+  }
+}
