@@ -15,16 +15,17 @@
 
 <script>
 import TopHeader from "./views/components/TopHeader.vue"
+import store from "@/store";
 
 export default {
   name: "App",
   components: {
     TopHeader
   },
-  mounted() {
-    // this.$store.dispatch('fetchEnumsMap'); // 页面刷新时请求数据
-    // 页面刷新时调用全局数据请求
-    // this.$store.dispatch('fetchEnumsMap');
+  beforeMount() {
+    store.dispatch('fetchEnumsMap').then(resp => {
+      console.log("获取全局枚举完成");
+    });
   }
 }
 </script>

@@ -156,7 +156,6 @@ export default {
         return {}
       }
       const val = this.settings.calculateSettingsFaceMap[key];
-      console.log("macd", val)
       return val.barSettingsMap[this.currentPeriod[key]];
       // return this.settings.calculateSettingsFaceMap[key];
     }
@@ -165,15 +164,10 @@ export default {
   mounted() {
     store.dispatch('getBars').then(resp => {
       this.bars = resp;
-      // console.log("this.bars: ", this.bars);
     });
     store.dispatch("indicators").then(resp => {
       this.indicators = resp;
-      // console.log("this.indicators: ", this.indicators);
     });
-
-    // console.log("SettingDetail mounted", store.getters('bars'));
-    // console.log("SettingDetail mounted", this.bars);
   },
   // 监听 this.settings 中属性的变化,
 }

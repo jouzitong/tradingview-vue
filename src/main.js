@@ -36,7 +36,7 @@ Vue.use(Tab).use(Tabs).use(Loading)
 //阻止启动生产消息，常用作指令
 Vue.config.productionTip = false
 
-store.dispatch('fetchEnumsMap'); // 页面刷新时请求数据
+// store.dispatch('fetchEnumsMap'); // 页面刷新时请求数据
 
 Vue.use(ElementUI, {size: 'middle', zIndex: 3000})
 new Vue({
