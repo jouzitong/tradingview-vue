@@ -4,6 +4,7 @@
     <div class="wrapper-text">
       <el-button type="text" @click="goto(1)">涨幅列表</el-button>
       <el-button type="text" @click="goto(2)">k线数据</el-button>
+      <el-button type="text" @click="goto(3)">配置列表</el-button>
     </div>
     <div class="setting"></div>
   </div>
@@ -17,10 +18,12 @@ export default {
   },
   methods: {
     goto(index) {
-      if (index == 1) {
+      if (index === 1) {
         this.$router.push({ path: "/order-list" })
-      } else if (index == 2) {
+      } else if (index === 2) {
         this.$router.push("/")
+      } else if (index === 3) {
+        this.$router.push("/settings")
       }
     }
   },

@@ -8,9 +8,9 @@
  */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-Vue.use(VueRouter)
-import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
+
+Vue.use(VueRouter)
 
 const routes = [
   {
@@ -49,6 +49,16 @@ const routes = [
     component: () => import('../views/Order.vue'),
     meta: {
       name: 'order',
+      title: '2.0模版',
+      requireLogin: false,
+    },
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: () => import('../views/settings/Settings.vue'),
+    meta: {
+      name: 'settings',
       title: '2.0模版',
       requireLogin: false,
     },

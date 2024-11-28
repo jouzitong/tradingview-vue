@@ -4,12 +4,12 @@
   </div>
 </template>
 <script>
-import { widget } from "./static/charting_library.min.js"
+import {widget} from "./static/charting_library.min.js"
 import datafeeds from "./static/datafees.js"
 import config from "./config"
 import tabsConfig from "./config/tabs"
-import { webSocketMixin } from "./mixin/webSocket"
-import $lodash from "lodash"
+import {webSocketMixin} from "./mixin/webSocket"
+
 export default {
   name: "sTradingview",
   mixins: [webSocketMixin],
@@ -401,7 +401,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-/deep/ .van-tabs--line .van-tabs__wrap {
+::v-deep.van-tabs--line .van-tabs__wrap {
   height: 100%;
 }
 .sTradingviewContent {

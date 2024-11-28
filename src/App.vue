@@ -8,17 +8,23 @@
 -->
 <template>
   <div id="app">
-    <TopHeader />
-    <router-view />
+    <TopHeader/>
+    <router-view/>
   </div>
 </template>
 
 <script>
 import TopHeader from "./views/components/TopHeader.vue"
+
 export default {
   name: "App",
   components: {
     TopHeader
+  },
+  mounted() {
+    // this.$store.dispatch('fetchEnumsMap'); // 页面刷新时请求数据
+    // 页面刷新时调用全局数据请求
+    // this.$store.dispatch('fetchEnumsMap');
   }
 }
 </script>
