@@ -56,7 +56,7 @@ const routes = [
   {
     path: '/settings',
     name: 'settings',
-    component: () => import('../views/settings/Settings.vue'),
+    component: () => import('../views/settings/index.vue'),
     meta: {
       name: 'settings',
       title: '2.0模版',

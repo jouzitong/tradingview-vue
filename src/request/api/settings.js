@@ -16,8 +16,8 @@ let api = {
     /**
      * 请求配置更新
      */
-    settingsUpdateApi: function (id) {
-        return $http.post(`/api/v1/settings/${id}`);
+    settingsUpdateApi: function (data) {
+        return $http.post(`/api/v1/settings`, data);
     },
 }
 

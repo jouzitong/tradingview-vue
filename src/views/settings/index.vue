@@ -7,7 +7,7 @@
       </div>
       <div class="left-drag"></div>
       <div class="main container">
-        <SettingsDetail :settings="settings"/>
+        <SettingsDetail :settings="settings" :save="updateSettings"/>
       </div>
       <div class="main-drag">
       </div>
@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import SettingsList from "@/views/settings/SettingsList";
-import SettingsDetail from "@/views/settings/SettingsDetail";
+import SettingsList from "@/views/settings/list.vue";
+import SettingsDetail from "@/views/settings/edit.vue";
 
 export default {
   name: "Settings",
@@ -47,6 +47,21 @@ export default {
   },
   computed: {},
   methods: {
+    updateSettings() {
+      console.log("保存: ",this.settings);
+      this.$http.settings.settingsUpdateApi(this.settings).then(resp => {
+        if (resp.code === 0) {
+          this.$message({
+            message: '保存成功',
+            type: 'success'
+          });
+          console.log("响应成功：", resp)
+        } else {
+          console.log("响应失败：", resp);
+        }
+      })
+    },
+
     updateInstId(instId) {
       // console.log("chooseInst", instId);
       this.instId = instId;

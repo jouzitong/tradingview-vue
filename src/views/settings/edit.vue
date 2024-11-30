@@ -1,0 +1,381 @@
+<template>
+  <div class="detail rollbar">
+    {{ settings }}
+    <hr/>
+    <form>
+      <div class="header-container">
+        <div class="header-left container">
+          <div>
+            产品ID: <input v-model="settings.instId" disabled/>
+          </div>
+          <!--  遍历 settings.bars  处理分析周期  -->
+          <div>
+            <p>分析周期:</p>
+            <div class="bars-container">
+              <div v-for="(val, index) in bars" class="bar-item">
+                <input type="checkbox"
+                       @change="updateBars(val.code, $event.target.checked)"
+                       v-model="settings.bars"
+                       v-bind:value="val.code"
+                       v-bind:checked="settings.bars.includes(val.code)"/>
+                {{ val.name }}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            目标权重: <input type="number" v-model="settings.targetWeight"/>
+          </div>
+        </div>
+        <!-- 下单配置  -->
+        <div class="header-right container">
+          <h2>下单配置</h2>
+          <div>
+            <label>自动下单: <span class="required">*</span></label>
+            <input name="goldenCrossLine" type="radio"
+                   value="false"/>否
+            <input type="radio" value="true"/>是
+          </div>
+          <div>
+            <div>
+              <label>下单金额: <span class="required">*</span></label>
+              <input type="number" value="100"/>
+            </div>
+            <div>
+              <label>杠杆倍数: <span class="required">*</span></label>
+              <input type="number" value="100"/>
+            </div>
+          </div>
+          <hr/>
+          <div>
+            <h2>下单限制</h2>
+            <div>
+              <label>允许开仓方向: <span class="required">*</span></label>
+              <input type="checkbox" value="long"/>多仓
+              <input type="checkbox" value="short"/>空仓
+            </div>
+            <div>
+              <div>
+                <label>开仓最高价: </label>
+                <input type="number" value="100"/>
+              </div>
+              <div>
+                <label>开仓最低价: </label>
+                <input type="number" value="100"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="indicators-container">
+        <p>计算指标:</p>
+        <div class="indicators-items">
+          <template v-for="(val,index) in indicators">
+            <div>
+              <input type="checkbox"
+                     @change="updateCalculateSettingsFaceMap(val.code, $event.target.checked)"
+                     v-bind:value="val.code"
+                     v-bind:checked="val.code in settings.calculateSettingsFaceMap"/>
+              <label>
+                {{ val.name }}
+              </label>
+            </div>
+          </template>
+        </div>
+        <div class="indicators-detail">
+          <!-- MACD -->
+          <div style="flex: 1" v-show="isShow('MACD')">
+            <h2>MACD</h2>
+            <div ref="MACD" id="MACD" class="settings">
+              <template v-for="bar in (bars)">
+                <template v-if="settings.bars.includes(bar.code)">
+                  <div ref="'macd-'+ {{bar.code}}" class="settings-item">
+                    <select disabled>
+                      <option :value="bar.code">
+                        {{ bar.name }}（分析周期）<p/>
+                      </option>
+                    </select>
+                    <!-- 参数输入区域 -->
+                    <div class="parameters">
+                      <div class="parameter-row">
+                        <label>权重: <span class="required">*</span></label>
+                        <input type="number" v-model="macd(bar).weights" min="1"/>
+                      </div>
+                      <div class="parameter-row">
+                        <label>短周期: <span class="required">*</span></label>
+                        <input type="number" v-model="macd(bar).shortPeriod" min="1"/>
+                      </div>
+                      <div class="parameter-row">
+                        <label>长周期: <span class="required">*</span></label>
+                        <input type="number" v-model="macd(bar).longPeriod" min="1"/>
+                      </div>
+                      <div class="parameter-row">
+                        <label>信号周期: <span class="required">*</span></label>
+                        <input type="number" v-model="macd(bar).signalPeriod" min="1"/>
+                      </div>
+                    </div>
+
+                    <!-- 策略1 -->
+                    <div id="macd-strategy1" class="strategy">
+                      <h2>策略1</h2>
+                      <div class="parameter-row">
+                        <label>是否金叉死叉: <span class="required">*</span></label>
+                        <input name="goldenCrossLine" type="radio"
+                               v-model="macd(bar).goldenCrossLine"
+                               value="false"
+                             p @change=""/>
+                        <p>否</p>
+                        <input type="radio" v-model="macd(bar).goldenCrossLine" value="true"/>
+                        <p>是</p>
+                      </div>
+                    </div>
+
+                    <!-- 策略2 -->
+                    <div id="macd-strategy2" class="strategy">
+                      <h2>策略2</h2>
+                      <div class="parameter-row">
+                        <label>末位计算周期: <span class="required">*</span></label>
+                        <input type="number" v-model="macd(bar).lastPeriod" min="1"/>
+                      </div>
+                      <div class="parameter-row">
+                        <label>最小连续次数: <span class="required">*</span></label>
+                        <input type="number" v-model="macd(bar).minContinuityCount" min="1"/>
+                      </div>
+                      <div class="parameter-row">
+                        <label>最大连续次数: <span class="required">*</span></label>
+                        <input type="number" v-model="macd(bar).maxContinuityCount" min="1"/>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </template>
+            </div>
+          </div>
+          <!-- RSI -->
+          <div style="flex: 1" v-show="isShow('RSI')">
+            <h2>RSI</h2>
+            <div ref="RSI" id="RSI" class="settings">
+              <template v-for="bar in (bars)">
+                <template v-if="settings.bars.includes(bar.code)">
+                  <div ref="'macd-'+ {{bar.code}}" class="settings-item">
+                    <select disabled>
+                      <option :value="bar.code"> {{ bar.name }}（分析周期）</option>
+                    </select>
+                    <!-- 参数输入区域 -->
+                    <div class="parameters">
+                      <div class="parameter-row">
+                        <label>周期: <span class="required">*</span></label>
+                        <input type="number" v-model="getIndex('RSI',bar).period" min="1"/>
+                      </div>
+                      <div class="parameter-row">
+                        <label>权重: <span class="required">*</span></label>
+                        <input type="number" v-model="getIndex('RSI',bar).weights" min="1"/>
+                      </div>
+                    </div>
+
+                    <!-- 策略 -->
+                    <div class="strategy">
+                      <h2>策略</h2>
+                      <div class="parameter-row">
+                        <label>超买界限: <span class="required">*</span></label>
+                        <input type="number" v-model="getIndex('RSI',bar).overbought" min="1"/>
+                      </div>
+                      <div class="parameter-row">
+                        <label>超卖界限: <span class="required">*</span></label>
+                        <input type="number" v-model="getIndex('RSI',bar).oversold" min="1"/>
+                      </div>
+                    </div>
+
+                  </div>
+                </template>
+              </template>
+            </div>
+          </div>
+
+
+        </div>
+
+      </div>
+
+      <div>
+        <button class="test-red" @click="save">保存</button>
+        <button class="test-red">取消</button>
+      </div>
+
+    </form>
+  </div>
+</template>
+
+<script>
+import store from "@/store";
+
+export default {
+  name: "SettingDetail",
+  props: ["settings", "save"],
+  data() {
+    return {
+      bars: null,
+      indicators: null,
+    }
+  },
+  methods: {
+
+    updateCalculateSettingsFaceMap(key, check) {
+      // console.log("计算指标", key, "更新 =>", check)
+      if (check) {
+        if (!(key in this.settings.calculateSettingsFaceMap)) {
+          // this.settings.calculateSettingsFaceMap[key] = {enable: true};
+          this.$set(this.settings.calculateSettingsFaceMap, key, {enable: true, barSettingsMap: {}});
+        } else {
+          this.settings.calculateSettingsFaceMap[key].enable = true;
+        }
+      } else {
+        this.settings.calculateSettingsFaceMap[key].enable = false;
+      }
+      // console.log(this.settings.calculateSettingsFaceMap)
+    },
+
+    updateBars(bar, check) {
+      console.log("分析周期", bar, "更新 =>", check);
+      console.log(this.settings.bars)
+    },
+    isShow(key) {
+      if (!(key in this.settings.calculateSettingsFaceMap)) {
+        return false
+      }
+      return this.settings.calculateSettingsFaceMap[key].enable;
+    },
+
+    macd(bar) {
+      return this.getIndex("MACD", bar);
+    },
+
+    getIndex(key, bar) {
+      let val = this.settings.calculateSettingsFaceMap[key];
+
+      if ('RSI' === key) {
+        console.log(key, ' --- ', val);
+      }
+      if (!val) {
+        return {};
+      }
+
+      if (!val.barSettingsMap[bar.code]) {
+        this.$set(val.barSettingsMap, bar.code, {weights: 40,});
+        return this.settings.calculateSettingsFaceMap[key];
+      }
+      return val.barSettingsMap[bar.code];
+    }
+
+  },
+  mounted() {
+    store.dispatch('getBars').then(resp => {
+      this.bars = resp;
+    });
+    store.dispatch("indicators").then(resp => {
+      this.indicators = resp;
+    });
+  },
+  // 监听 this.settings 中属性的变化,
+}
+</script>
+
+<style scoped lang="less">
+
+.header-container {
+  display: flex;
+
+  .header-left {
+    flex: 1;
+  }
+
+  .header-right {
+    flex: 2;
+  }
+}
+
+//label {
+//  width: 150px;
+//  display: inline-block;
+//  text-align: right;
+//}
+
+.label-name {
+
+}
+
+.label-value {
+
+}
+
+.indicators-container {
+  .indicators-detail {
+    display: flex;
+    flex: 1;
+  }
+
+  .indicators-items {
+    display: flex;
+  }
+
+}
+
+.settings {
+  flex: 1;
+
+  .settings-item {
+    height: 450px;
+    /* 设置边框 */
+    border: 1px solid white;
+    /* 设置宽度占25% */
+    flex: 1;
+    flex-shrink: 0;
+  }
+}
+
+.detail {
+  /* 整体靠左 */
+  text-align: left;
+  /*  */
+}
+
+input[type=number] {
+  color: red;
+  /* 宽度设置80px */
+  width: 80px;
+}
+
+.bars-container {
+  display: flex;
+  flex-wrap: wrap; /* 换行 */
+  //gap: 5px; /* 元素间距 */
+}
+
+.bar-item {
+  width: calc(25% - 5px); /* 每行 4 个，减去间距 */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.rollbar {
+  text-align: left;
+  /* 滚动条设置 */
+  overflow-y: auto;
+  height: 100%;
+  /* 滚动条样式 */
+  scrollbar-width: unset;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+/* 写一个显示边框的样式 */
+.container {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+</style>

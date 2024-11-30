@@ -1,13 +1,12 @@
 <template>
   <div class="list">
-    <h1>配置列表2</h1>
+    <h1>配置列表</h1>
     <ol v-for="(inst, index) in items" :key="index">
       <li >
         <span class="test-box-show" @click="chooseInst(inst.instId)" >{{ inst.instId }}
         <span v-if="inst.enablePlace">(开启自动下单)</span>
         </span>
         <!-- TODO 修改展示格式 -->
-
       </li>
     </ol>
   </div>
