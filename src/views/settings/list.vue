@@ -18,7 +18,7 @@ export default {
   props: [
     "items","chooseInst"
   ],
-  /*data() {sd
+  /*data() {
     return {
       items: [
         {

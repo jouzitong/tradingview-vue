@@ -16,11 +16,11 @@ export default new Vuex.Store({
     },
     actions: {
         fetchEnumsMap({commit}) {
-            console.log("获取全局枚举参数")
+            // console.log("获取全局枚举参数")
             try {
                 global.enums().then(response => {
                     if (response.code === 0) {
-                        console.log("全局枚举参数", response.data);
+                        // console.log("全局枚举参数", response.data);
                         const data = new Map(Object.entries(response.data));
                         commit('updateEnumsMap', data);
                     }

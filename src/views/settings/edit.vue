@@ -32,18 +32,27 @@
           <h2>下单配置</h2>
           <div>
             <label>自动下单: <span class="required">*</span></label>
-            <input name="goldenCrossLine" type="radio"
-                   value="false"/>否
-            <input type="radio" value="true"/>是
+            <input name="enablePlaceOrder" type="radio"
+                   v-model="placeOrder().enablePlaceOrder"
+                   :value="false"
+                   @change=""/>
+            <span>否</span>
+
+            <input name="enablePlaceOrder" type="radio"
+                   v-model="placeOrder().enablePlaceOrder"
+                   :value="true"
+                   @change=""/>
+            <span>是</span>
+
           </div>
           <div>
             <div>
               <label>下单金额: <span class="required">*</span></label>
-              <input type="number" value="100"/>
+              <input name="cash" type="number" v-model="placeOrder().cash"/>
             </div>
             <div>
               <label>杠杆倍数: <span class="required">*</span></label>
-              <input type="number" value="100"/>
+              <input name="lever" type="number" v-model="placeOrder().lever"/>
             </div>
           </div>
           <hr/>
@@ -51,22 +60,27 @@
             <h2>下单限制</h2>
             <div>
               <label>允许开仓方向: <span class="required">*</span></label>
-              <input type="checkbox" value="long"/>多仓
-              <input type="checkbox" value="short"/>空仓
+              <input name="sides" type="checkbox"
+                     v-model="placeOrder().limit.sides"
+                     value="long"
+                     v-bind:checked="'long' in placeOrder().limit.sides"/>多仓
+              <input name="sides" type="checkbox"
+                     v-model="placeOrder().limit.sides"
+                     value="short"
+                     v-bind:checked="'short' in placeOrder().limit.sides"/>空仓
             </div>
             <div>
               <div>
                 <label>开仓最高价: </label>
-                <input type="number" value="100"/>
+                <input name="maxPrice" type="number" v-model="placeOrder().limit.maxPrice"/>
               </div>
               <div>
                 <label>开仓最低价: </label>
-                <input type="number" value="100"/>
+                <input name="minPrice" type="number" v-model="placeOrder().limit.minPrice"/>
               </div>
             </div>
           </div>
         </div>
-
       </div>
 
       <div class="indicators-container">
@@ -74,7 +88,7 @@
         <div class="indicators-items">
           <template v-for="(val,index) in indicators">
             <div>
-              <input type="checkbox"
+              <input name="calculateSettingsFaceMap" type="checkbox"
                      @change="updateCalculateSettingsFaceMap(val.code, $event.target.checked)"
                      v-bind:value="val.code"
                      v-bind:checked="val.code in settings.calculateSettingsFaceMap"/>
@@ -125,10 +139,10 @@
                         <input name="goldenCrossLine" type="radio"
                                v-model="macd(bar).goldenCrossLine"
                                value="false"
-                             p @change=""/>
-                        <p>否</p>
+                               @change=""/>
+                        否
                         <input type="radio" v-model="macd(bar).goldenCrossLine" value="true"/>
-                        <p>是</p>
+                        是
                       </div>
                     </div>
 
@@ -193,17 +207,14 @@
               </template>
             </div>
           </div>
-
-
         </div>
-
       </div>
 
-      <div>
+      <div class="container-tail">
         <button class="test-red" @click="save">保存</button>
+        <button class="test-red" @click="applyAll">应用全部配置</button>
         <button class="test-red">取消</button>
       </div>
-
     </form>
   </div>
 </template>
@@ -213,7 +224,7 @@ import store from "@/store";
 
 export default {
   name: "SettingDetail",
-  props: ["settings", "save"],
+  props: ["settings", "save", "applyAll"],
   data() {
     return {
       bars: null,
@@ -223,11 +234,14 @@ export default {
   methods: {
 
     updateCalculateSettingsFaceMap(key, check) {
-      // console.log("计算指标", key, "更新 =>", check)
       if (check) {
         if (!(key in this.settings.calculateSettingsFaceMap)) {
           // this.settings.calculateSettingsFaceMap[key] = {enable: true};
-          this.$set(this.settings.calculateSettingsFaceMap, key, {enable: true, barSettingsMap: {}});
+          this.$set(this.settings.calculateSettingsFaceMap, key, {
+            enable: true,
+            indicatorType: key,
+            barSettingsMap: {}
+          });
         } else {
           this.settings.calculateSettingsFaceMap[key].enable = true;
         }
@@ -252,16 +266,19 @@ export default {
       return this.getIndex("MACD", bar);
     },
 
+    // 获取下单配置
+    placeOrder() {
+      // if (this.settings.placeOrderSettings === undefined) {
+      //   return {limit: {}};
+      // }
+      return this.settings.placeOrderSettings;
+    },
+
     getIndex(key, bar) {
       let val = this.settings.calculateSettingsFaceMap[key];
-
-      if ('RSI' === key) {
-        console.log(key, ' --- ', val);
-      }
       if (!val) {
         return {};
       }
-
       if (!val.barSettingsMap[bar.code]) {
         this.$set(val.barSettingsMap, bar.code, {weights: 40,});
         return this.settings.calculateSettingsFaceMap[key];
@@ -300,15 +317,16 @@ export default {
 //  width: 150px;
 //  display: inline-block;
 //  text-align: right;
+//
+//  .label-name {
+//
+//  }
+//
+//  .label-value {
+//
+//  }
 //}
 
-.label-name {
-
-}
-
-.label-value {
-
-}
 
 .indicators-container {
   .indicators-detail {
@@ -326,7 +344,7 @@ export default {
   flex: 1;
 
   .settings-item {
-    height: 450px;
+    height: 430px;
     /* 设置边框 */
     border: 1px solid white;
     /* 设置宽度占25% */
@@ -376,6 +394,16 @@ input[type=number] {
   border-radius: 5px;
   padding: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.container-tail {
+  color: #0a8415;
+
+  button {
+    /* 按钮变大 200px */
+    font-size: larger;
+  }
+
 }
 
 </style>

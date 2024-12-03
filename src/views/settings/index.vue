@@ -7,7 +7,7 @@
       </div>
       <div class="left-drag"></div>
       <div class="main container">
-        <SettingsDetail :settings="settings" :save="updateSettings"/>
+        <SettingsDetail :settings="settings" :save="updateSettings" :apply-all="applyAll"/>
       </div>
       <div class="main-drag">
       </div>
@@ -50,6 +50,20 @@ export default {
     updateSettings() {
       console.log("保存: ",this.settings);
       this.$http.settings.settingsUpdateApi(this.settings).then(resp => {
+        if (resp.code === 0) {
+          this.$message({
+            message: '保存成功',
+            type: 'success'
+          });
+          console.log("响应成功：", resp)
+        } else {
+          console.log("响应失败：", resp);
+        }
+      })
+    },
+    applyAll() {
+      console.log("保存: ",this.settings);
+      this.$http.settings.applyAll(this.settings).then(resp => {
         if (resp.code === 0) {
           this.$message({
             message: '保存成功',

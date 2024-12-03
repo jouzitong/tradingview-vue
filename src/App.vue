@@ -22,7 +22,7 @@ export default {
   components: {
     TopHeader
   },
-  beforeMount() {
+  beforeCreate() {
     store.dispatch('fetchEnumsMap').then(resp => {
       console.log("获取全局枚举完成");
     });
