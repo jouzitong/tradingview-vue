@@ -91,9 +91,17 @@
               <input name="calculateSettingsFaceMap" type="checkbox"
                      @change="updateCalculateSettingsFaceMap(val.code, $event.target.checked)"
                      v-bind:value="val.code"
-                     v-bind:checked="val.code in settings.calculateSettingsFaceMap"/>
+                     v-bind:checked="val.code in settings.calculateSettingsFaceMap"
+                     v-bind:disabled="val.name === 'BOLL' || val.name === 'K line'"
+              />
               <label>
-                {{ val.name }}
+                <!-- 判断如果 val.name === BOLL, 字体打下划线 -->
+                <template v-if="val.name === 'BOLL'">
+                  <span class="delete">{{ val.name }}</span>
+                </template>
+                <template v-else>
+                  {{ val.name }}
+                </template>
               </label>
             </div>
           </template>
@@ -138,28 +146,31 @@
                         <label>是否金叉死叉: <span class="required">*</span></label>
                         <input name="goldenCrossLine" type="radio"
                                v-model="macd(bar).goldenCrossLine"
-                               value="false"
-                               @change=""/>
-                        否
-                        <input type="radio" v-model="macd(bar).goldenCrossLine" value="true"/>
-                        是
+                               :value="false"
+                               @change="updateGoldenCrossLine(false,bar)"
+                        />否
+                        <input type="radio"
+                               v-model="macd(bar).goldenCrossLine"
+                               :value="true"
+                               @change="updateGoldenCrossLine(true,bar)"
+                        />是
                       </div>
                     </div>
 
                     <!-- 策略2 -->
-                    <div id="macd-strategy2" class="strategy">
+                    <div ref="macd-strategy2" class="strategy" v-show="!macd(bar).goldenCrossLine">
                       <h2>策略2</h2>
                       <div class="parameter-row">
                         <label>末位计算周期: <span class="required">*</span></label>
-                        <input type="number" v-model="macd(bar).lastPeriod" min="1"/>
+                        <input name="lastPeriod" type="number" v-model="macd(bar).lastPeriod" min="1"/>
                       </div>
                       <div class="parameter-row">
                         <label>最小连续次数: <span class="required">*</span></label>
-                        <input type="number" v-model="macd(bar).minContinuityCount" min="1"/>
+                        <input name="minContinuityCount" type="number" v-model="macd(bar).minContinuityCount" min="1"/>
                       </div>
                       <div class="parameter-row">
                         <label>最大连续次数: <span class="required">*</span></label>
-                        <input type="number" v-model="macd(bar).maxContinuityCount" min="1"/>
+                        <input name="maxContinuityCount" type="number" v-model="macd(bar).maxContinuityCount" min="1"/>
                       </div>
                     </div>
                   </div>
@@ -207,6 +218,40 @@
               </template>
             </div>
           </div>
+          <!-- KDJ -->
+          <div style="flex: 1" v-show="isShow('KDJ')">
+            <h2>KDJ</h2>
+            <div ref="KDJ" id="KDJ" class="settings">
+              <template v-for="bar in (bars)">
+                <template v-if="settings.bars.includes(bar.code)">
+                  <div ref="'macd-'+ {{bar.code}}" class="settings-item">
+                    <select disabled>
+                      <option :value="bar.code"> {{ bar.name }}（分析周期）</option>
+                    </select>
+                    <!-- 参数输入区域 -->
+                    <div class="parameters">
+                      <div class="parameter-row">
+                        <label>周期: <span class="required">*</span></label>
+                        <input type="number" v-model="getIndex('KDJ',bar).period" min="1"/>
+                      </div>
+                      <div class="parameter-row">
+                        <label>权重: <span class="required">*</span></label>
+                        <input type="number" v-model="getIndex('KDJ',bar).weights" min="1"/>
+                      </div>
+                      <div class="parameter-row">
+                        <label>平滑系数: <span class="required">*</span></label>
+                        <input type="number" v-model="getIndex('KDJ',bar).alpha" min="1"/>
+                      </div>
+                    </div>
+                    <!-- 策略 -->
+                    <div class="strategy">
+                      <h2>策略</h2>
+                    </div>
+                  </div>
+                </template>
+              </template>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -232,6 +277,10 @@ export default {
     }
   },
   methods: {
+
+    updateGoldenCrossLine(check, bar) {
+      this.macd(bar).goldenCrossLine = check;
+    },
 
     updateCalculateSettingsFaceMap(key, check) {
       if (check) {
@@ -403,7 +452,13 @@ input[type=number] {
     /* 按钮变大 200px */
     font-size: larger;
   }
+}
 
+.delete {
+  /* 删除线 */
+  text-decoration: line-through;
+  color: yellow;
+  background-color: #6f2626;
 }
 
 </style>
