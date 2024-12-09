@@ -5,7 +5,7 @@ let api = {
      * 测试get
      */
     enums: function () {
-        return $http.get('/api/v1/global/enums');
+        return $http.get('/platform/api/v1/global/enums');
     },
 }
 

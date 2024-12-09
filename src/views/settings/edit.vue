@@ -28,17 +28,19 @@
           </div>
         </div>
         <!-- 下单配置  -->
-        <div class="header-right container">
+        <div class="header-right container" v-if="placeOrder()">
           <h2>下单配置</h2>
           <div>
             <label>自动下单: <span class="required">*</span></label>
             <input name="enablePlaceOrder" type="radio"
+                   v-if="placeOrder()"
                    v-model="placeOrder().enablePlaceOrder"
                    :value="false"
                    @change=""/>
             <span>否</span>
 
             <input name="enablePlaceOrder" type="radio"
+                   v-if="placeOrder()"
                    v-model="placeOrder().enablePlaceOrder"
                    :value="true"
                    @change=""/>
@@ -48,11 +50,12 @@
           <div>
             <div>
               <label>下单金额: <span class="required">*</span></label>
-              <input name="cash" type="number" v-model="placeOrder().cash"/>
+              <input name="cash" type="number"
+                     v-if="placeOrder()" v-model="placeOrder().cash"/>
             </div>
             <div>
               <label>杠杆倍数: <span class="required">*</span></label>
-              <input name="lever" type="number" v-model="placeOrder().lever"/>
+              <input name="lever" type="number" v-if="" v-model="placeOrder().lever"/>
             </div>
           </div>
           <hr/>

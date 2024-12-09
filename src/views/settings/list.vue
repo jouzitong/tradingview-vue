@@ -2,11 +2,13 @@
   <div class="list">
     <h1>配置列表</h1>
     <ol v-for="(inst, index) in items" :key="index">
-      <li >
-        <span class="test-box-show" @click="chooseInst(inst.instId)" >{{ inst.instId }}
-        <span v-if="inst.enablePlace">(开启自动下单)</span>
+      <li>
+        <span class="test-box-show" @click="chooseInst(inst.instId)">{{ inst.instId }}
+          <el-switch v-model="inst.enablePlace"
+                     @change="(val)=>{handleSwitchChange(val,inst,index)}"
+                     active-text="开" active-color="green"
+                     inactive-text="关" inactive-color="red"/>
         </span>
-        <!-- TODO 修改展示格式 -->
       </li>
     </ol>
   </div>
@@ -16,19 +18,36 @@
 export default {
   name: "SettingsList",
   props: [
-    "items","chooseInst"
+    "items", "chooseInst"
   ],
-  /*data() {
-    return {
-      items: [
-        {
-          instId: 'BTC',
-          /!* 能否自动下单 *!/
-          "enablePlace": false,
-        }
-      ]
+  data() {
+    return {}
+  },
+  methods: {
+    handleSwitchChange(enable, item, index) {
+      console.log(item, index, enable)
+      if (enable) {
+        this.$confirm('此操作将永久删除该传输记录, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+              //     确认
+              console.log("确认", this.items[index]),
+                  this.items[index].enablePlace = true
+              this.$http.settings.enablePlaceOrder(this.items[index].instId, true)
+            }
+        ).catch(
+            //     取消事件
+            //     console.log("quxiao 取消");
+            this.items[index].enablePlace = false
+        )
+      } else {
+        // 关闭逻辑
+        this.$http.settings.enablePlaceOrder(this.items[index].instId, false)
+      }
     }
-  }*/
+  }
 }
 
 
