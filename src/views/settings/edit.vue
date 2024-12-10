@@ -1,6 +1,6 @@
 <template>
   <div class="detail rollbar">
-    {{ settings }}
+<!--    {{ settings }}-->
     <hr/>
     <form>
       <div class="header-container">

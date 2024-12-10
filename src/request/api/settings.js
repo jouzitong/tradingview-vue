@@ -21,10 +21,29 @@ let api = {
         return $http.post(`/platform/api/v1/settings`, data);
     },
 
+    /**
+     * 开/关自动下单功能 API
+     * @param id
+     * @param enable
+     */
     enablePlaceOrder: function (id, enable) {
         return $http.post(`/platform/api/v1/settings/${id}/${enable}`);
-
     },
+
+    /**
+     * 同步产品配置
+     */
+    syncSettings: function (id) {
+        return $http.post(`/platform/api/v1/settings/syncSettings/${id}`);
+    },
+
+    /**
+     * 同步所有配置
+     */
+    syncAllSettings: function () {
+        return $http.post(`/platform/api/v1/settings/syncAllSettings`);
+    },
+
 
     /**
      * 应用所有的配置

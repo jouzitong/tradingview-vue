@@ -1,9 +1,13 @@
 <template>
   <div class="list">
-    <h1>配置列表</h1>
+    <h1>配置列表
+      <button style="font-size: smaller" class="sync-button" @click="syncAllSettings">全部同步</button>
+    </h1>
     <ol v-for="(inst, index) in items" :key="index">
       <li>
         <span class="test-box-show" @click="chooseInst(inst.instId)">{{ inst.instId }}
+          <button class="sync-button" @click="syncSettings(inst.instId)">配置同步</button>
+
           <el-switch v-model="inst.enablePlace"
                      @change="(val)=>{handleSwitchChange(val,inst,index)}"
                      active-text="开" active-color="green"
@@ -43,7 +47,16 @@ export default {
         // 关闭逻辑
         this.$http.settings.enablePlaceOrder(this.items[index].instId, false)
       }
-    }
+    },
+    syncSettings(instId) {
+      console.log("同步配置: ", instId);
+      this.$http.settings.syncSettings(instId);
+    },
+    syncAllSettings() {
+      console.log("同步所有配置");
+      this.$http.settings.syncAllSettings();
+    },
+
   }
 }
 
@@ -96,6 +109,10 @@ export default {
 
 .test-box-show span {
   margin-right: 10px;
+}
+
+.sync-button {
+  background-color: green;
 }
 
 </style>
