@@ -20,9 +20,6 @@ export default {
   props: [
     "items", "chooseInst"
   ],
-  data() {
-    return {}
-  },
   methods: {
     handleSwitchChange(enable, item, index) {
       console.log(item, index, enable)

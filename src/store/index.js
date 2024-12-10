@@ -20,8 +20,8 @@ export default new Vuex.Store({
             try {
                 global.enums().then(response => {
                     if (response.code === 0) {
-                        // console.log("全局枚举参数", response.data);
-                        const data = new Map(Object.entries(response.data));
+                        // console.log("全局枚举参数", response.data.data);
+                        const data = new Map(Object.entries(response.data.data));
                         commit('updateEnumsMap', data);
                     }
                 })

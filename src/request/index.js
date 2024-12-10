@@ -34,7 +34,7 @@ $http.interceptors.response.use(
         //去请求状态码
         // statusCode(response.data.code, response.data.msg, response);
         // console.log('请求结束 关闭loading')
-        // console.log('请求结束 关闭loading',response.data)
+        console.log('请求结束 关闭loading',response.data)
         return response.data;
     },
     error => {

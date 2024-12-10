@@ -243,7 +243,7 @@
                       </div>
                       <div class="parameter-row">
                         <label>平滑系数: <span class="required">*</span></label>
-                        <input type="number" v-model="getIndex('KDJ',bar).alpha" min="1"/>
+                        <input type="number" v-model="getIndex('KDJ',bar).alpha"/>
                       </div>
                     </div>
                     <!-- 策略 -->
@@ -341,10 +341,11 @@ export default {
   },
   mounted() {
     store.dispatch('getBars').then(resp => {
+      console.log("获取bars: ",resp)
       this.bars = resp;
     });
     store.dispatch("indicators").then(resp => {
-      this.indicators = resp;
+      this.indicators = resp
     });
   },
   // 监听 this.settings 中属性的变化,

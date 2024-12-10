@@ -3,7 +3,7 @@
     <div class="container-top"></div>
     <div class="container-main">
       <div class="left container">
-        <SettingsList :items="items" :chooseInst="updateInstId"/>
+        <SettingsList :items="items" :chooseInst="chooseInst"/>
       </div>
       <div class="left-drag"></div>
       <div class="main container">
@@ -45,10 +45,9 @@ export default {
       settings: {}
     }
   },
-  computed: {},
   methods: {
     updateSettings() {
-      console.log("保存: ",this.settings);
+      console.log("保存: ", this.settings);
       this.$http.settings.settingsUpdateApi(this.settings).then(resp => {
         if (resp.code === 0) {
           this.$message({
@@ -62,7 +61,7 @@ export default {
       })
     },
     applyAll() {
-      console.log("保存: ",this.settings);
+      console.log("保存: ", this.settings);
       this.$http.settings.applyAll(this.settings).then(resp => {
         if (resp.code === 0) {
           this.$message({
@@ -76,13 +75,12 @@ export default {
       })
     },
 
-    updateInstId(instId) {
-      // console.log("chooseInst", instId);
+    chooseInst(instId) {
       this.instId = instId;
       this.settings.instId = instId;
       this.$http.settings.settingsDetailApi(instId).then(resp => {
         if (resp.code === 0) {
-          this.settings = resp.data;
+          this.settings = resp.data.data;
           // console.log(this.settings)
         } else {
           console.log("响应失败：", resp);
@@ -92,7 +90,8 @@ export default {
     getList() {
       this.$http.settings.settingsListApi().then(resp => {
         if (resp.code === 0) {
-          this.items = resp.data;
+          // console.log(resp.data)
+          this.items = resp.data.data;
         } else {
           console.log("响应失败：", resp);
         }
