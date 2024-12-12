@@ -1,4 +1,5 @@
 import $lodash from "lodash";
+
 export const webSocketMixin = {
   data() {
     return {
@@ -81,6 +82,7 @@ export const webSocketMixin = {
       const self = this;
       let setInt = null;
       let res = JSON.parse(msg.data);
+      console.log("ws收到的消息: ",res)
       if (Array.isArray(res)) {
         let arrayData = [];
         res.map((item) => {

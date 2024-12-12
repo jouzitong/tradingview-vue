@@ -1,4 +1,3 @@
-import $lodash from 'lodash'
 export const webSocketMixin = {
   data() {
     return {
@@ -93,7 +92,7 @@ export const webSocketMixin = {
       const self = this
       let setInt = null
       let res = JSON.parse(msg.data)
-      console.log('收到消息', res)
+      console.log('收到消息', msg)
       if (res.code == 0) {
         // this.leftData
         if (res.data && res.data.length > 0) {

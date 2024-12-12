@@ -80,7 +80,7 @@ export default {
       this.settings.instId = instId;
       this.$http.settings.settingsDetailApi(instId).then(resp => {
         if (resp.code === 0) {
-          this.settings = resp.data.data;
+          this.settings = resp.data;
           // console.log(this.settings)
         } else {
           console.log("响应失败：", resp);
@@ -90,8 +90,7 @@ export default {
     getList() {
       this.$http.settings.settingsListApi().then(resp => {
         if (resp.code === 0) {
-          // console.log(resp.data)
-          this.items = resp.data.data;
+          this.items = resp.data;
         } else {
           console.log("响应失败：", resp);
         }
