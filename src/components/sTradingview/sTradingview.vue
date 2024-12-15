@@ -1,19 +1,19 @@
 <template>
   <div class="sTradingviewContent">
     <van-tabs
-      class="tabsWrap"
-      title-active-color="#6394f0"
-      title-inactive-color="#7a90ad"
-      color="#6394f0"
-      background="#2a3041"
-      v-model="interval"
-      @change="changeTabs"
+        class="tabsWrap"
+        title-active-color="#6394f0"
+        title-inactive-color="#7a90ad"
+        color="#6394f0"
+        background="#2a3041"
+        v-model="interval"
+        @change="changeTabs"
     >
       <van-tab
-        v-for="(item, index) in tabsArr"
-        :title="item.label"
-        :name="item.resolution"
-        :key="index"
+          v-for="(item, index) in tabsArr"
+          :title="item.label"
+          :name="item.resolution"
+          :key="index"
       />
     </van-tabs>
     <div :id="domId" class="sTradingviewView"></div>
@@ -46,10 +46,8 @@ export default {
     },
     //参数
     marketName: {
-      type: String,
-      default: function () {
-        return "";
-      },
+      type: Object,
+      required: true,
     },
     // 请求id
     marketId: {
@@ -88,6 +86,16 @@ export default {
       onRealtimeCallback: null, //websocket数据回调
     };
   },
+
+  watch: {
+    // 监听 marketName 属性的变化
+    marketName: {
+      deep: true, // 深度监听
+      handler(newVal) {
+        console.log("参数发送了变化")
+      }
+    },
+  },
   mounted() {
     //加载K线图
     this.loadChart();
@@ -116,11 +124,11 @@ export default {
 
     // 请求数据
     getBars(
-      symbolInfo,
-      resolution,
-      rangeStartDate,
-      rangeEndDate,
-      onLoadedCallback
+        symbolInfo,
+        resolution,
+        rangeStartDate,
+        rangeEndDate,
+        onLoadedCallback
     ) {
       this.onLoadedCallback = onLoadedCallback;
       // this.webSocket("load");
@@ -128,11 +136,11 @@ export default {
 
     //socket
     subscribeBars(
-      symbolInfo,
-      resolution,
-      onRealtimeCallback,
-      subscriberUID,
-      onResetCacheNeededCallback
+        symbolInfo,
+        resolution,
+        onRealtimeCallback,
+        subscriberUID,
+        onResetCacheNeededCallback
     ) {
       this.onRealtimeCallback = onRealtimeCallback;
       // this.webSocket("get");
@@ -171,18 +179,19 @@ export default {
     setSymbols() {
       let self = this;
       self.chart.setSymbol(self.symbol, self.filter(self.interval), function (
-        e
+          e
       ) {
         self.chart.chart().setVisibleRange(self.initdata);
         self.chart.chart().executeActionById("timeScaleReset");
       });
 
       this.chart
-        .chart()
-        .setResolution(
-          self.filter(self.interval),
-          function onReadyCallback() {}
-        );
+          .chart()
+          .setResolution(
+              self.filter(self.interval),
+              function onReadyCallback() {
+              }
+          );
     },
 
     //卸载K线
@@ -211,7 +220,7 @@ export default {
         indicators_file_name: "custom-study(MACD红绿).js",
         drawings_access: {
           type: "black",
-          tools: [{ name: "Regression Trend" }],
+          tools: [{name: "Regression Trend"}],
         },
         //配置项
         ...config,
@@ -230,13 +239,13 @@ export default {
       let self = this;
       if (e == "1s") {
         self.chart
-          .activeChart()
-          .getAllStudies()
-          .forEach((e) => {
-            if (e.name == "Moving Average") {
-              self.chart.activeChart().removeEntity(e.id);
-            }
-          });
+            .activeChart()
+            .getAllStudies()
+            .forEach((e) => {
+              if (e.name == "Moving Average") {
+                self.chart.activeChart().removeEntity(e.id);
+              }
+            });
       } else {
         //检查是否存在MA
         this.getAllStudiesFun();
@@ -247,12 +256,12 @@ export default {
       let self = this;
       let strArr = [];
       self.chart
-        .activeChart()
-        .getAllStudies()
-        .forEach((e) => {
-          // console.log(e);
-          strArr.push(e.name);
-        });
+          .activeChart()
+          .getAllStudies()
+          .forEach((e) => {
+            // console.log(e);
+            strArr.push(e.name);
+          });
       if (JSON.stringify(strArr).indexOf("Moving Average") == -1) {
         //创建指标
         self.createStudyFun();
@@ -269,26 +278,27 @@ export default {
       try {
         self.chart.chart().createStudy("Moving Average", !1, !1, [7], null, {});
         self.chart
-          .chart()
-          .createStudy("Moving Average", !1, !1, [10], null, {});
+            .chart()
+            .createStudy("Moving Average", !1, !1, [10], null, {});
         self.chart
-          .chart()
-          .createStudy("Moving Average", !1, !1, [30], null, {});
+            .chart()
+            .createStudy("Moving Average", !1, !1, [30], null, {});
 
         if (self.is_MACD) {
           self.chart.chart().createStudy("MACD", !1, !1, [20], null, {}); //MACD
           self.chart
-            .chart()
-            .createStudy(
-              "指数平滑异同移动平均线(MACD_Custom)",
-              false,
-              false,
-              [20],
-              null,
-              {}
-            ); //自定义MACD
+              .chart()
+              .createStudy(
+                  "指数平滑异同移动平均线(MACD_Custom)",
+                  false,
+                  false,
+                  [20],
+                  null,
+                  {}
+              ); //自定义MACD
         }
-      } catch (e) {}
+      } catch (e) {
+      }
     },
     //销毁之前
     beforeDestroy() {
@@ -301,12 +311,15 @@ export default {
 ::v-deep.van-tabs--line .van-tabs__wrap {
   height: 100%;
 }
+
 .sTradingviewContent {
   height: 100%;
   width: 100%;
+
   .tabsWrap {
     height: 88px;
   }
+
   .sTradingviewView {
     height: calc(100% - 88px);
   }

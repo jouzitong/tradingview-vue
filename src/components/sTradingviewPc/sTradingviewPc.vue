@@ -30,10 +30,8 @@ export default {
     },
     //参数
     marketName: {
-      type: String,
-      default: function () {
-        return ""
-      }
+      type: Object,
+      required: true,
     },
     // 请求id
     marketId: {
@@ -73,11 +71,48 @@ export default {
       onRealtimeCallback: null //websocket数据回调
     }
   },
+
   mounted() {
+    console.log("初始 marketName:", this.marketName);
     //加载K线图
     this.loadChart()
   },
   methods: {
+
+    sendMsg() {
+      // 断开连接参数
+      let close = {
+        opCode: -1,
+        data: {
+          uid: this.marketName.uid,
+          instId: this.marketName.instId,
+        }
+      };
+
+      this.marketName.settingsContext = JSON.stringify(this.marketName.settingsContext)
+      let open = {
+        opCode: 1003,
+        data: this.marketName
+      }
+      this.interval = "15"
+      const bar = this.marketName.bar;
+      console.log("当前时间周期: ", bar)
+      if (bar === "1m") {
+        this.interval = "1";
+      }
+      if (bar === "5m") {
+        this.interval = "5";
+      }
+      if (bar === "15m") {
+        this.interval = "15";
+      }
+      if (bar === "1D") {
+        this.interval = "1D";
+      }
+      this.websockSend(close)
+      this.websockSend(open)
+    },
+
     /**
      * 切换触发
      * e {string} reset=重置数据
@@ -97,16 +132,16 @@ export default {
 
     //过滤 时段
     filter(time) {
-      return time == "1s" ? "1S" : time
+      return time === "1s" ? "1S" : time
     },
 
     // 请求数据 symbolInfo, resolution(周期）, periodParams, onHistoryCallback, onErrorCallback)
     getBars(
-      symbolInfo,
-      resolution,
-      rangeStartDate,
-      rangeEndDate,
-      onLoadedCallback
+        symbolInfo,
+        resolution,
+        rangeStartDate,
+        rangeEndDate,
+        onLoadedCallback
     ) {
       this.onLoadedCallback = onLoadedCallback
       // this.webSocket("load");
@@ -126,11 +161,11 @@ export default {
     // minSize: 标记的最小尺寸 (diameter, pixels)
     // 每个K线允许几个标记（现在最多为10个）。不允许标记脱离K线。
     getMarks(
-      symbolInfo,
-      rangeStartDate,
-      rangeEndDate,
-      onDataedCallback,
-      resolution
+        symbolInfo,
+        rangeStartDate,
+        rangeEndDate,
+        onDataedCallback,
+        resolution
     ) {
       this.onDataedCallback = onDataedCallback
       // this.webSocket("load");
@@ -138,11 +173,11 @@ export default {
 
     //socket
     subscribeBars(
-      symbolInfo,
-      resolution,
-      onRealtimeCallback,
-      subscriberUID,
-      onResetCacheNeededCallback
+        symbolInfo,
+        resolution,
+        onRealtimeCallback,
+        subscriberUID,
+        onResetCacheNeededCallback
     ) {
       this.onRealtimeCallback = onRealtimeCallback
       // this.webSocket("get");
@@ -190,20 +225,21 @@ export default {
     setSymbols() {
       let self = this
       self.chart.setSymbol(
-        self.symbol,
-        self.filter(self.interval),
-        function (e) {
-          self.chart.chart().setVisibleRange(self.initdata)
-          self.chart.chart().executeActionById("timeScaleReset")
-        }
+          self.symbol,
+          self.filter(self.interval),
+          function (e) {
+            self.chart.chart().setVisibleRange(self.initdata)
+            self.chart.chart().executeActionById("timeScaleReset")
+          }
       )
 
       this.chart
-        .chart()
-        .setResolution(
-          self.filter(self.interval),
-          function onReadyCallback() {}
-        )
+          .chart()
+          .setResolution(
+              self.filter(self.interval),
+              function onReadyCallback() {
+              }
+          )
     },
 
     //卸载K线
@@ -236,7 +272,7 @@ export default {
         indicators_file_name: "custom-study(MACD红绿).js",
         drawings_access: {
           type: "black",
-          tools: [{ name: "Regression Trend" }]
+          tools: [{name: "Regression Trend"}]
         },
         //配置项
         ...config
@@ -255,65 +291,65 @@ export default {
       for (var i = 0; i < buttons.length; i++) {
         ;(function (button) {
           let defaultClass = thats
-            .createButton()
-            .attr("title", button.label)
-            .addClass(
-              `mydate ${
-                button.resolution == self.interval ? "s_active" : ""
-              }`
-            )
-            .text(button.label)
-            .on("click", function (e) {
-              if (this.className.indexOf("s_active") > -1) {
-                // 已经选中
-                return false
-              }
-              let curent =
-                e.currentTarget.parentNode.parentElement.childNodes
-              for (let index of curent) {
-                if (
-                  index.className.indexOf("my-group") > -1 &&
-                  index.childNodes[0].className.indexOf("s_active") >
-                    -1
-                ) {
-                  index.childNodes[0].className =
-                    index.childNodes[0].className.replace(
-                      "s_active",
-                      ""
-                    )
-                } else {
-                  self.removeClassName(e)
+              .createButton()
+              .attr("title", button.label)
+              .addClass(
+                  `mydate ${
+                      button.resolution == self.interval ? "s_active" : ""
+                  }`
+              )
+              .text(button.label)
+              .on("click", function (e) {
+                if (this.className.indexOf("s_active") > -1) {
+                  // 已经选中
+                  return false
                 }
-              }
-              this.className = `${this.className} s_active`
-              self.changeTabs(button.resolution)
-            })
-            .parent()
-            .addClass(
-              "my-group" +
-                (button.resolution == self.interval
-                  ? " s_active"
-                  : "")
-            )
+                let curent =
+                    e.currentTarget.parentNode.parentElement.childNodes
+                for (let index of curent) {
+                  if (
+                      index.className.indexOf("my-group") > -1 &&
+                      index.childNodes[0].className.indexOf("s_active") >
+                      -1
+                  ) {
+                    index.childNodes[0].className =
+                        index.childNodes[0].className.replace(
+                            "s_active",
+                            ""
+                        )
+                  } else {
+                    self.removeClassName(e)
+                  }
+                }
+                this.className = `${this.className} s_active`
+                self.changeTabs(button.resolution)
+              })
+              .parent()
+              .addClass(
+                  "my-group" +
+                  (button.resolution == self.interval
+                      ? " s_active"
+                      : "")
+              )
         })(buttons[i])
       }
     },
     //删除 按钮非选中的class
     removeClassName(el) {
       let dom =
-        el.currentTarget.parentNode.parentNode.parentNode.childNodes
+          el.currentTarget.parentNode.parentNode.parentNode.childNodes
       for (var i = 0; i < dom.length; i++) {
         if (dom[i].hasChildNodes()) {
           if (
-            dom[i].childNodes[0].childNodes[0].className.indexOf(
-              "s_active"
-            ) > -1
+              dom[i].childNodes[0].childNodes[0].className.indexOf(
+                  "s_active"
+              ) > -1
           ) {
             dom[i].childNodes[0].childNodes[0].className = dom[
-              i
-            ].childNodes[0].childNodes[0].className.replace(
-              "s_active",
-              ""
+                i
+                ].childNodes[0].childNodes[0].className.replace(
+                "s_active",
+                ""
             )
           }
         }
@@ -327,13 +363,13 @@ export default {
       let self = this
       if (e == "1s") {
         self.chart
-          .activeChart()
-          .getAllStudies()
-          .forEach(e => {
-            if (e.name == "Moving Average") {
-              self.chart.activeChart().removeEntity(e.id)
-            }
-          })
+            .activeChart()
+            .getAllStudies()
+            .forEach(e => {
+              if (e.name == "Moving Average") {
+                self.chart.activeChart().removeEntity(e.id)
+              }
+            })
       } else {
         //检查是否存在MA
         this.getAllStudiesFun()
@@ -344,12 +380,12 @@ export default {
       let self = this
       let strArr = []
       self.chart
-        .activeChart()
-        .getAllStudies()
-        .forEach(e => {
-          // console.log(e);
-          strArr.push(e.name)
-        })
+          .activeChart()
+          .getAllStudies()
+          .forEach(e => {
+            // console.log(e);
+            strArr.push(e.name)
+          })
       if (JSON.stringify(strArr).indexOf("Moving Average") == -1) {
         //创建指标
         self.createStudyFun()
@@ -360,38 +396,39 @@ export default {
       let self = this
       try {
         self.chart
-          .chart()
-          .createStudy("Moving Average", !1, !1, [7], null, {})
+            .chart()
+            .createStudy("Moving Average", !1, !1, [7], null, {})
         self.chart
-          .chart()
-          .createStudy("Moving Average", !1, !1, [10], null, {})
+            .chart()
+            .createStudy("Moving Average", !1, !1, [10], null, {})
         self.chart
-          .chart()
-          .createStudy("Moving Average", !1, !1, [30], null, {})
+            .chart()
+            .createStudy("Moving Average", !1, !1, [30], null, {})
 
         if (self.is_MACD) {
           self.chart
-            .chart()
-            .createStudy("MACD", !1, !1, [20], null, {}) //MACD
+              .chart()
+              .createStudy("MACD", !1, !1, [20], null, {}) //MACD
           self.chart
-            .chart()
-            .createStudy(
-              "指数平滑异同移动平均线(MACD_Custom)",
-              false,
-              false,
-              [20],
-              null,
-              {}
-            ) //自定义MACD
+              .chart()
+              .createStudy(
+                  "指数平滑异同移动平均线(MACD_Custom)",
+                  false,
+                  false,
+                  [20],
+                  null,
+                  {}
+              ) //自定义MACD
         }
         if (self.getMarks) {
           self.chart
-            .chart()
-            .createStudy("custom-marks", false, false, [], null, {
-              getMarks: this.getMarks
-            }) //MACD
+              .chart()
+              .createStudy("custom-marks", false, false, [], null, {
+                getMarks: this.getMarks
+              }) //MACD
         }
-      } catch (e) {}
+      } catch (e) {
+      }
     },
     //销毁之前
     beforeDestroy() {
@@ -404,12 +441,15 @@ export default {
 ::v-deep.van-tabs--line .van-tabs__wrap {
   height: 100%;
 }
+
 .sTradingviewContent {
   height: 100%;
   width: 100%;
+
   .tabsWrap {
     height: 88px;
   }
+
   .sTradingviewView {
     height: 100%;
     // height: calc(100% - 88px);

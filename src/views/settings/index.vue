@@ -81,7 +81,6 @@ export default {
       this.$http.settings.settingsDetailApi(instId).then(resp => {
         if (resp.code === 0) {
           this.settings = resp.data;
-          // console.log(this.settings)
         } else {
           console.log("响应失败：", resp);
         }
