@@ -1,7 +1,6 @@
 <template>
   <div class="detail rollbar">
     {{ settings }}
-    <hr/>
     <form>
       <div class="header-container">
         <div class="header-left container">
@@ -12,9 +11,8 @@
           <div>
             <p>分析周期:</p>
             <div class="bars-container">
-              <div v-for="(val) in bars" :key="val" class="bar-item">
+              <div v-for="(val) in bars" :key="val.code" class="bar-item">
                 <input type="checkbox"
-                       @change="updateBars(val.code, $event.target.checked)"
                        v-model="settings.bars"
                        v-bind:value="val.code"
                        v-bind:checked="settings.bars.includes(val.code)"/>
@@ -89,7 +87,7 @@
       <div class="indicators-container">
         <p>计算指标:</p>
         <div class="indicators-items">
-          <template v-for="(val,index) in indicators">
+          <template v-for="(val) in indicators">
             <div>
               <input name="calculateSettingsFaceMap" type="checkbox"
                      @change="updateCalculateSettingsFaceMap(val.code, $event.target.checked)"
@@ -114,9 +112,9 @@
           <div style="flex: 1" v-show="isShow('MACD')">
             <h2>MACD</h2>
             <div ref="MACD" id="MACD" class="settings">
-              <template v-for="bar in (bars)">
+              <template v-for="(bar,index) in (bars)">
                 <template v-if="settings.bars.includes(bar.code)">
-                  <div ref="'macd-'+ {{bar.code}}" class="settings-item" :key="bar.code">
+                  <div ref="'macd-'+ {{bar.code}}" class="settings-item" :key="'macd_'+index">
                     <select disabled>
                       <option :value="bar.code">
                         {{ bar.name }}（分析周期）<p/>
@@ -185,9 +183,9 @@
           <div style="flex: 1" v-show="isShow('RSI')">
             <h2>RSI</h2>
             <div ref="RSI" id="RSI" class="settings">
-              <template v-for="bar in (bars)">
+              <template v-for="(bar,index) in (bars)">
                 <template v-if="settings.bars.includes(bar.code)">
-                  <div ref="'macd-'+ {{bar.code}}" class="settings-item">
+                  <div ref="'macd-'+ {{bar.code}}" class="settings-item" :key="'rsi_'+index">
                     <select disabled>
                       <option :value="bar.code"> {{ bar.name }}（分析周期）</option>
                     </select>
@@ -225,9 +223,9 @@
           <div style="flex: 1" v-show="isShow('KDJ')">
             <h2>KDJ</h2>
             <div ref="KDJ" id="KDJ" class="settings">
-              <template v-for="bar in (bars)">
+              <template v-for="(bar,index) in (bars)">
                 <template v-if="settings.bars.includes(bar.code)">
-                  <div ref="'macd-'+ {{bar.code}}" class="settings-item">
+                  <div ref="'macd-'+ {{bar.code}}" class="settings-item" :key="'kdj_'+index">
                     <select disabled>
                       <option :value="bar.code"> {{ bar.name }}（分析周期）</option>
                     </select>
@@ -259,9 +257,9 @@
           <div style="flex: 1" v-show="isShow('K line')">
             <h2>K line</h2>
             <div ref="kLine" id="kLine" class="settings">
-              <template v-for="bar in (bars)">
+              <template v-for="(bar,index) in (bars)">
                 <template v-if="settings.bars.includes(bar.code)">
-                  <div ref="'kLine-'+ {{bar.code}}" class="settings-item">
+                  <div ref="'kLine-'+ {{bar.code}}" class="settings-item" :key="'kLine_'+index">
                     <select disabled>
                       <option :value="bar.code"> {{ bar.name }}（分析周期）</option>
                     </select>
@@ -317,12 +315,6 @@ import store from "@/store";
 export default {
   name: "SettingDetail",
   props: ["settings", "save", "applyAll"],
-  data() {
-    return {
-      bars: null,
-      indicators: null,
-    }
-  },
   methods: {
 
     updateGoldenCrossLine(check, bar) {
@@ -347,10 +339,6 @@ export default {
       // console.log(this.settings.calculateSettingsFaceMap)
     },
 
-    updateBars(bar, check) {
-      // console.log("分析周期", bar, "更新 =>", check);
-      // console.log(this.settings.bars)
-    },
     isShow(key) {
       if (!(key in this.settings.calculateSettingsFaceMap)) {
         return false
@@ -375,28 +363,36 @@ export default {
       // 判断 val 是否存在
       if (!val) {
         // 如果不存在，设置默认值
-        if ('k line' === key) {
-          return {lossStrategy: {}};
+        if ('K line' === key) {
+          return {lossStrategy: {timePeriod: 12, minDiffRate: 0.1, reboundRate: 0.02}};
         }
-        return {};
+        return {weights: 40,};
       }
       if (!val.barSettingsMap[bar.code]) {
-        this.$set(val.barSettingsMap, bar.code, {weights: 40,});
+        if ('K line' === key) {
+          this.$set(val.barSettingsMap, bar.code, {
+            weights: 40,
+            lossStrategy: {timePeriod: 12, minDiffRate: 0.1, reboundRate: 0.02}
+          });
+        } else {
+          this.$set(val.barSettingsMap, bar.code, {weights: 40,});
+        }
         return this.settings.calculateSettingsFaceMap[key];
       }
       return val.barSettingsMap[bar.code];
     }
 
   },
-  beforeMount() {
-    store.dispatch('getBars').then(resp => {
-      this.bars = resp;
-    });
-    store.dispatch("indicators").then(resp => {
-      this.indicators = resp
-    });
+
+  computed: {
+    bars() {
+      return store.getters.bars;
+    },
+    indicators() {
+      return store.getters.indicators;
+    }
   },
-  // 监听 this.settings 中属性的变化,
+
 }
 </script>
 

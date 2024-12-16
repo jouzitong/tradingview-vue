@@ -26,6 +26,12 @@ export default {
     store.dispatch('fetchEnumsMap').then(resp => {
       console.log("获取全局枚举完成");
     });
+  },
+  mounted() {
+    console.log(this,"this",store)
+    store.dispatch('fetchEnumsMap').then(res => {
+      console.log("获取全局枚举完成",res);
+    });
   }
 }
 </script>

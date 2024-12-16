@@ -66,7 +66,7 @@ const routes = [
     {
         path: '/trading',
         name: 'trading',
-        component: () => import('../views/trading/index.vue'),
+        component: () => import('../views/services/trading/index.vue'),
         meta: {
             name: 'trading',
             title: '2.0模版',
@@ -76,7 +76,7 @@ const routes = [
     {
         path: '/collector',
         name: 'collector',
-        component: () => import('../views/collector/index.vue'),
+        component: () => import('../views/services/collector/index.vue'),
         meta: {
             name: 'collector',
             title: '2.0模版',

@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import store from '@/store'
 import SettingsList from "@/views/settings/list.vue";
 import SettingsDetail from "@/views/settings/edit.vue";
 
@@ -76,7 +77,6 @@ export default {
     },
 
     chooseInst(instId) {
-      console.log("选中: ", instId)
       this.instId = instId;
       this.settings.instId = instId;
       this.$http.settings.settingsDetailApi(instId).then(resp => {

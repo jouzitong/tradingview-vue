@@ -6,7 +6,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        enumsMap: new Map(),
+        enumsMap: new Map(), // 全局枚举参数
         globalData: null, // 全局参数
     },
     mutations: {
@@ -20,9 +20,10 @@ export default new Vuex.Store({
             try {
                 global.enums().then(response => {
                     if (response.code === 0) {
-                        // console.log("全局枚举参数", response.data);
+                        console.log("全局枚举参数", response.data);
                         const data = new Map(Object.entries(response.data));
                         commit('updateEnumsMap', data);
+                    }else{
                     }
                 })
             } catch (error) {
@@ -40,9 +41,9 @@ export default new Vuex.Store({
         bars: (state) => {
             return state.enumsMap?.get('bars') || null; // 便于组件访问
         },
-        getEnums: (state, key) => {
-            return state.enumsMap.get(key); // 便于组件访问
-        }
+        indicators: (state) => {
+            return state.enumsMap?.get('indicators') || null; // 便于组件访问
+        },
     },
     modules: {},
 

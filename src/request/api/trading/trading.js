@@ -27,6 +27,27 @@ let api = {
         return $http.get(`/trading/api/v1/trading/settings/${id}`);
     },
 
+    /**
+     * 获取产品配置
+     */
+    addById: function (id) {
+        return $http.post(`/platform/pri/api/v1/trading/${id}`);
+    },
+
+    /**
+     * 更新同步配置
+     */
+    updateSyncSettings: function (id) {
+        return $http.put(`/platform/pri/api/v1/trading/${id}`);
+    },
+
+    /**
+     * 删除产品配置
+     */
+    deleteById: function (id) {
+        return $http.delete(`/platform/pri/api/v1/trading/${id}`);
+    },
+
 }
 
 export default api
