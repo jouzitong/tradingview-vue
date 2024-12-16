@@ -3,7 +3,8 @@ import home from "./home";
 import settings from "./settings";
 import global from "./global";
 import instruments from "./instruments";
+import trading from "./trading";
 
 export default {
-    home, settings, global, instruments
+    home, settings, global, instruments, trading
 }

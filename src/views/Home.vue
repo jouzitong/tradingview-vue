@@ -10,9 +10,11 @@
 -->
 <template>
   <div class="content">
-    <button @click="showSettings=true">配置</button>
-    <button>停止</button>
-    <button>下一个</button>
+    <div>
+      <button @click="showSettings=true">配置</button>
+      <button>停止</button>
+      <button>下一个</button>
+    </div>
     <!-- 移动端 -->
     <s-tradingview
         v-if="!isPC"
@@ -133,7 +135,7 @@ export default {
   name: "home",
   data() {
     return {
-      showSettings: false,
+      showSettings: true,
       isPC: true,
       marketId: this.$route.query.marketId,
       marketName: this.$route.query.marketName,

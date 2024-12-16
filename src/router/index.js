@@ -13,62 +13,82 @@ import 'nprogress/nprogress.css'
 Vue.use(VueRouter)
 
 const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: () => import('../views/Home.vue'),
-    meta: {
-      name: 'home',
-      title: '2.0模版',
-      requireLogin: true,
+    {
+        path: '/home',
+        name: 'home',
+        component: () => import('../views/Home.vue'),
+        meta: {
+            name: 'home',
+            title: '2.0模版',
+            requireLogin: false,
+        },
     },
-  },
-  {
-    path: '/test',
-    name: 'test',
-    component: () => import('../views/Test.vue'),
-    meta: {
-      name: 'test',
-      title: '2.0模版',
-      requireLogin: false,
+    {
+        path: '/test',
+        name: 'test',
+        component: () => import('../views/Test.vue'),
+        meta: {
+            name: 'test',
+            title: '2.0模版',
+            requireLogin: false,
+        },
     },
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import('../views/Login.vue'),
-    meta: {
-      name: 'login',
-      title: '2.0模版',
-      requireLogin: false,
+    {
+        path: '/login',
+        name: 'login',
+        component: () => import('../views/Login.vue'),
+        meta: {
+            name: 'login',
+            title: '2.0模版',
+            requireLogin: false,
+        },
     },
-  },
-  {
-    path: '/order-list',
-    name: 'order-list',
-    component: () => import('../views/Order.vue'),
-    meta: {
-      name: 'order',
-      title: '2.0模版',
-      requireLogin: false,
+    {
+        path: '/order-list',
+        name: 'order-list',
+        component: () => import('../views/Order.vue'),
+        meta: {
+            name: 'order',
+            title: '2.0模版',
+            requireLogin: false,
+        },
     },
-  },
-  {
-    path: '/settings',
-    name: 'settings',
-    component: () => import('../views/settings/index.vue'),
-    meta: {
-      name: 'settings',
-      title: '2.0模版',
-      requireLogin: false,
+    {
+        path: '/settings',
+        name: 'settings',
+        component: () => import('../views/settings/index.vue'),
+        meta: {
+            name: 'settings',
+            title: '2.0模版',
+            requireLogin: false,
+        },
     },
-  },
+    {
+        path: '/trading',
+        name: 'trading',
+        component: () => import('../views/trading/index.vue'),
+        meta: {
+            name: 'trading',
+            title: '2.0模版',
+            requireLogin: false,
+        },
+    },
+    {
+        path: '/collector',
+        name: 'collector',
+        component: () => import('../views/collector/index.vue'),
+        meta: {
+            name: 'collector',
+            title: '2.0模版',
+            requireLogin: false,
+        },
+    },
 ]
 
 const router = new VueRouter({
-  // mode: 'history',
-  // base: process.env.BASE_URL, //默认值: "/" , 应用的基路径。例如，如果整个单页应用服务在 /app/ 下，然后 base 就应该设为 "/app/" https://router.vuejs.org/zh/api/#base
-  routes,
+    // mode: 'history',
+    // base: process.env.BASE_URL, //默认值: "/" , 应用的基路径。例如，如果整个单页应用服务在 /app/ 下，然后 base 就应该设为 "/app/" https://router.vuejs.org/zh/api/#base
+    routes,
 })
 
 //路由守卫
