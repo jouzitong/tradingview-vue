@@ -76,6 +76,7 @@ export default {
     },
 
     chooseInst(instId) {
+      console.log("选中: ", instId)
       this.instId = instId;
       this.settings.instId = instId;
       this.$http.settings.settingsDetailApi(instId).then(resp => {

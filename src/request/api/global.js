@@ -2,7 +2,7 @@ import $http from '@/request';
 
 let api = {
     /**
-     * 测试get
+     * 获取全局枚举
      */
     enums: function () {
         return $http.get('/platform/api/v1/global/enums');

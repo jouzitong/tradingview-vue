@@ -27,7 +27,7 @@ let api = {
      * @param enable
      */
     enablePlaceOrder: function (id, enable) {
-        return $http.post(`/platform/api/v1/settings/${id}/${enable}`);
+        return $http.post(`/platform/api/v1/settings/enablePlaceOrder/${id}/${enable}`);
     },
 
     /**

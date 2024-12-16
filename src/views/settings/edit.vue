@@ -1,6 +1,6 @@
 <template>
   <div class="detail rollbar">
-<!--    {{ settings }}-->
+    {{ settings }}
     <hr/>
     <form>
       <div class="header-container">
@@ -12,7 +12,7 @@
           <div>
             <p>分析周期:</p>
             <div class="bars-container">
-              <div v-for="(val, index) in bars" class="bar-item">
+              <div v-for="(val) in bars" :key="val" class="bar-item">
                 <input type="checkbox"
                        @change="updateBars(val.code, $event.target.checked)"
                        v-model="settings.bars"
@@ -36,14 +36,14 @@
                    v-if="placeOrder()"
                    v-model="placeOrder().enablePlaceOrder"
                    :value="false"
-                   @change=""/>
+            />
             <span>否</span>
 
             <input name="enablePlaceOrder" type="radio"
                    v-if="placeOrder()"
                    v-model="placeOrder().enablePlaceOrder"
                    :value="true"
-                   @change=""/>
+            />
             <span>是</span>
 
           </div>
@@ -55,7 +55,7 @@
             </div>
             <div>
               <label>杠杆倍数: <span class="required">*</span></label>
-              <input name="lever" type="number" v-if="" v-model="placeOrder().lever"/>
+              <input name="lever" type="number" v-model="placeOrder().lever"/>
             </div>
           </div>
           <hr/>
@@ -95,7 +95,7 @@
                      @change="updateCalculateSettingsFaceMap(val.code, $event.target.checked)"
                      v-bind:value="val.code"
                      v-bind:checked="val.code in settings.calculateSettingsFaceMap"
-                     v-bind:disabled="val.name === 'BOLL' || val.name === 'K line'"
+                     v-bind:disabled="val.name === 'BOLL'"
               />
               <label>
                 <!-- 判断如果 val.name === BOLL, 字体打下划线 -->
@@ -116,7 +116,7 @@
             <div ref="MACD" id="MACD" class="settings">
               <template v-for="bar in (bars)">
                 <template v-if="settings.bars.includes(bar.code)">
-                  <div ref="'macd-'+ {{bar.code}}" class="settings-item">
+                  <div ref="'macd-'+ {{bar.code}}" class="settings-item" :key="bar.code">
                     <select disabled>
                       <option :value="bar.code">
                         {{ bar.name }}（分析周期）<p/>
@@ -255,6 +255,50 @@
               </template>
             </div>
           </div>
+          <!-- K line -->
+          <div style="flex: 1" v-show="isShow('K line')">
+            <h2>K line</h2>
+            <div ref="kLine" id="kLine" class="settings">
+              <template v-for="bar in (bars)">
+                <template v-if="settings.bars.includes(bar.code)">
+                  <div ref="'kLine-'+ {{bar.code}}" class="settings-item">
+                    <select disabled>
+                      <option :value="bar.code"> {{ bar.name }}（分析周期）</option>
+                    </select>
+                    <!-- 参数输入区域 -->
+                    <div class="parameters">
+                      <div class="parameter-row">
+                        <label>周期: <span class="required">*</span></label>
+                        <input type="number" v-model="getIndex('K line',bar).period" min="1"/>
+                      </div>
+                      <div class="parameter-row">
+                        <label>权重: <span class="required">*</span></label>
+                        <input type="number" v-model="getIndex('K line',bar).weights" min="1"/>
+                      </div>
+                    </div>
+                    <!-- 策略 -->
+                    <div class="strategy">
+                      <h2>策略1: 抄底策略</h2>
+                      <div>
+                        <div class="parameter-row">
+                          <label>时间区间: <span class="required">*</span></label>
+                          <input type="number" v-model="getIndex('K line',bar).lossStrategy.timePeriod" min="1"/>
+                        </div>
+                        <div class="parameter-row">
+                          <label>最小变更幅度: <span class="required">*</span></label>
+                          <input type="number" v-model="getIndex('K line',bar).lossStrategy.minDiffRate" min="1"/>
+                        </div>
+                        <div class="parameter-row">
+                          <label>回弹幅度: <span class="required">*</span></label>
+                          <input type="number" v-model="getIndex('K line',bar).lossStrategy.reboundRate" min="1"/>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </template>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -304,8 +348,8 @@ export default {
     },
 
     updateBars(bar, check) {
-      console.log("分析周期", bar, "更新 =>", check);
-      console.log(this.settings.bars)
+      // console.log("分析周期", bar, "更新 =>", check);
+      // console.log(this.settings.bars)
     },
     isShow(key) {
       if (!(key in this.settings.calculateSettingsFaceMap)) {
@@ -328,7 +372,12 @@ export default {
 
     getIndex(key, bar) {
       let val = this.settings.calculateSettingsFaceMap[key];
+      // 判断 val 是否存在
       if (!val) {
+        // 如果不存在，设置默认值
+        if ('k line' === key) {
+          return {lossStrategy: {}};
+        }
         return {};
       }
       if (!val.barSettingsMap[bar.code]) {
@@ -339,9 +388,8 @@ export default {
     }
 
   },
-  mounted() {
+  beforeMount() {
     store.dispatch('getBars').then(resp => {
-      console.log("获取bars: ",resp)
       this.bars = resp;
     });
     store.dispatch("indicators").then(resp => {
