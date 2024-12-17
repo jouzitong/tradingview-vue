@@ -153,7 +153,6 @@ export default {
         limit: 100,
       },
       settingsContextInput: null,
-      bars: [],
       instIds: [],
     }
   },
@@ -217,16 +216,15 @@ export default {
       this.isPC = false
     }
   },
+  computed: {
+    bars() {
+      return store.getters.bars;
+    },
+  },
   beforeMount() {
-    store.dispatch('getBars').then(resp => {
-      console.log("获取bars: ", resp);
-      this.bars = resp;
-    });
     this.$http.instruments.instIds().then(resp => {
       if (resp.code === 0) {
         this.instIds = resp.data;
-      } else {
-        console.log("响应失败：", resp);
       }
     });
   },
@@ -244,7 +242,7 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 60%;
+  width: 20%;
   height: 60%;
   background-color: #fff;
   border: 1px solid #ccc;

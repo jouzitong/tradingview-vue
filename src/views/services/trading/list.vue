@@ -3,7 +3,7 @@
     <div class="list">
       <div>
         <h1>运行产品列表
-          <el-button @click="isForm=true">新增</el-button>
+          <el-button type="success" @click="isForm=true">新增</el-button>
         </h1>
       </div>
       <ol v-for="(inst, index) in items" :key="index">

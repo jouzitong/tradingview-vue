@@ -65,10 +65,20 @@ const routes = [
     },
     {
         path: '/trading',
-        name: 'trading',
+        name: '量化交易服务',
         component: () => import('../views/services/trading/index.vue'),
         meta: {
             name: 'trading',
+            title: '2.0模版',
+            requireLogin: false,
+        },
+    },
+    {
+        path: '/platform',
+        name: '平台服务',
+        component: () => import('../views/services/platform/index.vue'),
+        meta: {
+            name: 'platform',
             title: '2.0模版',
             requireLogin: false,
         },

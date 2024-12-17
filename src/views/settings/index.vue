@@ -18,9 +18,8 @@
 </template>
 
 <script>
-import store from '@/store'
 import SettingsList from "@/views/settings/list.vue";
-import SettingsDetail from "@/views/settings/edit.vue";
+import SettingsDetail from "@/views/components/settings/SettingsDetail.vue";
 
 export default {
   name: "Settings",

@@ -3,7 +3,16 @@
     <h1>配置列表
       <button style="font-size: smaller" class="sync-button" @click="syncAllSettings">全部同步</button>
     </h1>
-    <ol v-for="(inst, index) in items" :key="index">
+    <!-- 搜索框 -->
+    <div style="margin-bottom: 10px; color: red">
+      <input
+          v-model="searchText"
+          type="text"
+          placeholder="请输入InstId查询"
+          style="width: 200px; padding: 5px; font-size: 14px;"
+      />
+    </div>
+    <ol v-for="(inst, index) in filteredItems" :key="index">
       <li>
         <span class="test-box-show" @click="chooseInst(inst.instId)">{{ inst.instId }}
           <button class="sync-button" @click="syncSettings(inst.instId)">配置同步</button>
@@ -21,6 +30,11 @@
 <script>
 export default {
   name: "SettingsList",
+  data() {
+    return {
+      searchText: '',
+    };
+  },
   props: [
     "items", "chooseInst"
   ],
@@ -57,6 +71,17 @@ export default {
       this.$http.settings.syncAllSettings();
     },
 
+  },
+  computed: {
+    filteredItems() {
+      if (!this.searchText) {
+        return this.items; // 如果没有输入搜索内容，返回全部
+      }
+      // 过滤：instId 包含搜索文本
+      return this.items.filter((item) =>
+          item.instId.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+    },
   }
 }
 

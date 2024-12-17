@@ -59,6 +59,7 @@ export default {
         4: "/home",
         5: "/trading", // 量化交易服务
         6: "/collector", // 数据收集服务
+        7: "/platform", // 数据中心服务
       }
       this.$router.push({path: routes[index]});
     }

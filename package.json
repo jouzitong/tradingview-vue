@@ -30,6 +30,7 @@
     "vconsole": "^3.3.4",
     "vue": "^2.6.11",
     "vue-cropper": "^0.5.5",
+    "vue-json-editor": "^1.4.3",
     "vue-router": "^3.4.1",
     "vuex": "next",
     "webpack-dev-server": "^5.1.0"

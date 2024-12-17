@@ -17,8 +17,10 @@
         <div class="left container">
           <tradingList :items="items" :chooseInst="chooseInst"/>
         </div>
-        <div class="left-drag"></div>
-        <div class="main container">
+        <div class="left-drag">
+        </div>
+        <div class="main container" v-if="settings!=null">
+          <SettingsDetail :settings="settings" :can-update="false"/>
         </div>
         <div class="main-drag">
         </div>
@@ -32,22 +34,30 @@
 <script>
 
 import tradingList from "@/views/services/trading/list.vue";
+import SettingsDetail from "@/views/components/settings/SettingsDetail.vue";
 
 export default {
   name: "trading",
-  components: {tradingList},
+  components: {SettingsDetail, tradingList},
   data() {
     return {
       /* 系统状态 */
       status: false,
       items: [],
-
+      settings: null,
     }
   },
 
   methods: {
     chooseInst(instId) {
-      console.log(instId)
+      console.log(instId);
+      this.$http.trading.tradingSettings(instId).then(resp => {
+        if (resp.code === 0) {
+          this.settings = resp.data;
+        } else {
+          this.$message.error("获取配置异常:", resp);
+        }
+      });
     },
 
     getTradingState() {

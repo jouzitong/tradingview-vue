@@ -1,6 +1,6 @@
 <template>
   <div class="detail rollbar">
-    {{ settings }}
+    <!--    {{ settings }}-->
     <form>
       <div class="header-container">
         <div class="header-left container">
@@ -280,15 +280,15 @@
                       <div>
                         <div class="parameter-row">
                           <label>时间区间: <span class="required">*</span></label>
-                          <input type="number" v-model="getIndex('K line',bar).lossStrategy.timePeriod" min="1"/>
+                          <input type="number" v-model="getIndex('K line',bar).lossStrategy.timePeriod" min="1"/> 毫秒
                         </div>
                         <div class="parameter-row">
                           <label>最小变更幅度: <span class="required">*</span></label>
-                          <input type="number" v-model="getIndex('K line',bar).lossStrategy.minDiffRate" min="1"/>
+                          <input type="number" v-model="getIndex('K line',bar).lossStrategy.minDiffRate" min="0.01"/>
                         </div>
                         <div class="parameter-row">
                           <label>回弹幅度: <span class="required">*</span></label>
-                          <input type="number" v-model="getIndex('K line',bar).lossStrategy.reboundRate" min="1"/>
+                          <input type="number" v-model="getIndex('K line',bar).lossStrategy.reboundRate" min="0.01"/>
                         </div>
                       </div>
                     </div>
@@ -300,7 +300,7 @@
         </div>
       </div>
 
-      <div class="container-tail">
+      <div class="container-tail" v-show="canUpdate">
         <button class="test-red" @click="save">保存</button>
         <button class="test-red" @click="applyAll">应用全部配置</button>
         <button class="test-red">取消</button>
@@ -314,7 +314,13 @@ import store from "@/store";
 
 export default {
   name: "SettingDetail",
-  props: ["settings", "save", "applyAll"],
+  // props: ["settings", "save", "applyAll", "canUpdate",],
+  props: {
+    "settings": {required: true, type: Object},
+    "canUpdate": {required: false, type: Boolean, defaultValue: true},
+    "save": {required: false, type: Function},
+    "applyAll": {required: false, type: Function},
+  },
   methods: {
 
     updateGoldenCrossLine(check, bar) {
@@ -324,7 +330,6 @@ export default {
     updateCalculateSettingsFaceMap(key, check) {
       if (check) {
         if (!(key in this.settings.calculateSettingsFaceMap)) {
-          // this.settings.calculateSettingsFaceMap[key] = {enable: true};
           this.$set(this.settings.calculateSettingsFaceMap, key, {
             enable: true,
             indicatorType: key,
@@ -336,7 +341,6 @@ export default {
       } else {
         this.settings.calculateSettingsFaceMap[key].enable = false;
       }
-      // console.log(this.settings.calculateSettingsFaceMap)
     },
 
     isShow(key) {
