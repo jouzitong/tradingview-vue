@@ -29,6 +29,15 @@ let api = {
 
     /**
      * 获取产品配置
+     * @param id
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    trendDetail: function (id) {
+        return $http.get(`/trading/api/v1/trading/trendDetail/${id}`);
+    },
+
+    /**
+     * 获取产品配置
      */
     addById: function (id) {
         return $http.post(`/platform/pri/api/v1/trading/${id}`);

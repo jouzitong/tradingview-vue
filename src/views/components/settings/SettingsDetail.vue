@@ -1,11 +1,11 @@
 <template>
   <div class="detail rollbar">
-    <!--    {{ settings }}-->
+<!--    {{ settings }}-->
     <form>
       <div class="header-container">
         <div class="header-left container">
           <div>
-            产品ID: <input v-model="settings.instId" disabled/>
+            产品ID: <input type="text" v-model="settings.instId" disabled/>
           </div>
           <!--  遍历 settings.bars  处理分析周期  -->
           <div>
@@ -53,7 +53,7 @@
             </div>
             <div>
               <label>杠杆倍数: <span class="required">*</span></label>
-              <input name="lever" type="number" v-model="placeOrder().lever"/>
+              <input name="lever" type="number" v-model="placeOrder().lever"/> (当前账户配置: 全仓: x100, 逐仓 x20 ) <el-button type="warning">同步</el-button>
             </div>
           </div>
           <hr/>
@@ -460,7 +460,8 @@ export default {
   /*  */
 }
 
-input[type=number] {
+input[type=number],
+input[type=text] {
   color: red;
   /* 宽度设置80px */
   width: 80px;

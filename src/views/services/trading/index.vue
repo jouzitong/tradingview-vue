@@ -19,8 +19,19 @@
         </div>
         <div class="left-drag">
         </div>
-        <div class="main container" v-if="settings!=null">
-          <SettingsDetail :settings="settings" :can-update="false"/>
+
+        <div class="main container" v-if="chooseInstId!=null">
+         {{ isShowSettings}}
+          <div>
+            <el-button type="info" @click="isShowSettings=true">配置详情</el-button>
+            <el-button type="info" @click="isShowSettings=false">技术分析</el-button>
+          </div>
+          <div v-if="!isShowSettings">
+            <TrendDetail :instId="chooseInstId"/>
+          </div>
+          <div v-if="isShowSettings">
+            <SettingsDetail :settings="settings" :can-update="false"/>
+          </div>
         </div>
         <div class="main-drag">
         </div>
@@ -35,29 +46,28 @@
 
 import tradingList from "@/views/services/trading/list.vue";
 import SettingsDetail from "@/views/components/settings/SettingsDetail.vue";
+import TrendDetail from "@/views/services/trading/trendDetail.vue";
 
 export default {
   name: "trading",
-  components: {SettingsDetail, tradingList},
+  components: {SettingsDetail, tradingList, TrendDetail},
   data() {
     return {
       /* 系统状态 */
       status: false,
       items: [],
+      chooseInstId: null,
       settings: null,
+      trendDetail: null,
+      isShowSettings: true,
     }
   },
 
   methods: {
+
     chooseInst(instId) {
-      console.log(instId);
-      this.$http.trading.tradingSettings(instId).then(resp => {
-        if (resp.code === 0) {
-          this.settings = resp.data;
-        } else {
-          this.$message.error("获取配置异常:", resp);
-        }
-      });
+      this.chooseInstId = instId;
+      this.getSettingsDetail(this.chooseInstId);
     },
 
     getTradingState() {
@@ -70,6 +80,7 @@ export default {
         }
       })
     },
+
 
     handleSwitchChange(enable) {
       console.log("点击状态变更: ", enable)
@@ -107,7 +118,15 @@ export default {
         }
       })
     },
-
+    getSettingsDetail(instId) {
+      this.$http.trading.tradingSettings(instId).then(resp => {
+        if (resp.code === 0) {
+          this.settings = resp.data;
+        } else {
+          this.$message.error("获取配置详情异常:", resp);
+        }
+      });
+    }
   },
   mounted() {
     this.getTradingState();
