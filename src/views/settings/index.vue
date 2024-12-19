@@ -7,7 +7,7 @@
       </div>
       <div class="left-drag"></div>
       <div class="main container">
-        <SettingsDetail :settings="settings" :save="updateSettings" :apply-all="applyAll"/>
+        <SettingsDetail :settings="settings" :save="updateSettings" :apply-all="applyAll" :can-update="true"/>
       </div>
       <div class="main-drag">
       </div>

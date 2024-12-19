@@ -18,10 +18,31 @@ let api = {
     },
 
     /**
-     * 开始收集历史数据
+     * 开始收集所有的历史数据
      */
-    startCollect: function () {
+    startCollectAll: function () {
         return $http.get(`/collector/api/v1/kline/start`);
+    },
+
+    /**
+     * 开始收集指定产品的历史数据
+     */
+    startCollectByInstId: function (instId) {
+        return $http.get(`/collector/api/v1/kline/collect/${instId}`);
+    },
+
+    /**
+     * k 线数据存储的产品列表
+     */
+    kStoreInstList: function () {
+        return $http.get(`/collector/api/v1/kStores/list`);
+    },
+
+    /**
+     * k 线数据存储 同步
+     */
+    kStoreFileSync: function (instId, bar) {
+        return $http.get(`/platform//api/v1/historyData/file/download?instId=${instId}&bar=${bar}`);
     },
 
 }
