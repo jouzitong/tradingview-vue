@@ -17,16 +17,6 @@
           <el-dropdown-item command="6">数据收集服务</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-      <!-- 一级菜单: 项目配置 -->
-      <el-dropdown @command="goto" disabled>
-        <el-button type="text">
-          项目配置(未完成) <i class="el-icon-arrow-down el-icon--right"></i>
-        </el-button>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="15">量化交易服务</el-dropdown-item>
-          <el-dropdown-item command="16">数据收集服务</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
 
       <!-- 一级菜单: 项目配置 -->
       <el-dropdown @command="goto" disabled>

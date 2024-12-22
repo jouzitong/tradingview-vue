@@ -170,12 +170,11 @@ export default {
 
     // 更新数据方法
     updateBar(productId, bar) {
-      console.log(`更新产品 ${productId} 的时间粒度: ${bar.name}`);
-      console.log(`时间范围: ${bar.start} 至 ${bar.end}`);
+      this.$http.collector.startCollectByInstId(productId);
     },
 
     syncInstFile(id, bar) {
-      this.$http.collector.kStoreFileSync().then(resp => {
+      this.$http.collector.kStoreFileSync(id, bar).then(resp => {
         if (resp.code === 0) {
           this.$message.success("操作成功");
         } else {

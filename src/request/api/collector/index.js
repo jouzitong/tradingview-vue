@@ -42,7 +42,7 @@ let api = {
      * k 线数据存储 同步
      */
     kStoreFileSync: function (instId, bar) {
-        return $http.get(`/platform//api/v1/historyData/file/download?instId=${instId}&bar=${bar}`);
+        return $http.get(`/platform/api/v1/historyData/file/download?instId=${instId}&bar=${bar}`);
     },
 
 }
