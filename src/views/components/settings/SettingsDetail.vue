@@ -1,6 +1,6 @@
 <template>
   <div class="detail rollbar">
-<!--    {{ settings }}-->
+    <!--    {{ settings }}-->
     <form>
       <div class="header-container">
         <div class="header-left container">
@@ -53,7 +53,9 @@
             </div>
             <div>
               <label>杠杆倍数: <span class="required">*</span></label>
-              <input name="lever" type="number" v-model="placeOrder().lever"/> (当前账户配置: 全仓: x100, 逐仓 x20 ) <el-button type="warning">同步</el-button>
+              <input name="lever" type="number" v-model="placeOrder().lever"/>
+              <span>(当前账户配置: 全仓: x100, 逐仓 多x20  空x10)</span>
+              <el-button type="warning">同步</el-button>
             </div>
           </div>
           <hr/>

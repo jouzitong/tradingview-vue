@@ -21,17 +21,16 @@
         </div>
 
         <div class="main container" v-if="chooseInstId!=null">
-         {{ isShowSettings}}
           <div>
             <el-button type="info" @click="isShowSettings=true">配置详情</el-button>
             <el-button type="info" @click="isShowSettings=false">技术分析</el-button>
           </div>
-          <div v-if="!isShowSettings">
-            <TrendDetail :instId="chooseInstId"/>
+          <div v-if="!isShowSettings" >
+            <TrendDetail :instId="chooseInstId" @changeKey="changeKey"/>
           </div>
-          <div v-if="isShowSettings">
+<!--          <div v-if="isShowSettings">
             <SettingsDetail :settings="settings" :can-update="false"/>
-          </div>
+          </div>-->
         </div>
         <div class="main-drag">
         </div>
@@ -55,6 +54,7 @@ export default {
     return {
       /* 系统状态 */
       status: false,
+      key:0,
       items: [],
       chooseInstId: null,
       settings: null,
@@ -64,9 +64,13 @@ export default {
   },
 
   methods: {
-
+    changeKey(val){
+      this.key = val
+      console.log(val,"更新key")
+    },
     chooseInst(instId) {
       this.chooseInstId = instId;
+
       this.getSettingsDetail(this.chooseInstId);
     },
 

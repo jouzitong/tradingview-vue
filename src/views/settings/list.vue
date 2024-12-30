@@ -11,6 +11,8 @@
           placeholder="请输入InstId查询"
           style="width: 200px; padding: 5px; font-size: 14px;"
       />
+<!--      <button style="font-size: smaller" class="sync-button" @click="addSettings">新增</button>-->
+
     </div>
     <ol v-for="(inst, index) in filteredItems" :key="index">
       <li>
@@ -70,6 +72,10 @@ export default {
       console.log("同步所有配置");
       this.$http.settings.syncAllSettings();
     },
+
+    addSettings() {
+
+    }
 
   },
   computed: {

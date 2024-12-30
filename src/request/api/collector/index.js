@@ -45,6 +45,13 @@ let api = {
         return $http.get(`/platform/api/v1/historyData/file/download?instId=${instId}&bar=${bar}`);
     },
 
+    /**
+     * k 线数据存储 同步所有的产品文件
+     */
+    kStoreFileSyncAll: function () {
+        return $http.get(`/platform/api/v1/historyData/file/download/all`);
+    },
+
 }
 
 export default api

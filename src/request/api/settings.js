@@ -1,17 +1,26 @@
 import $http from '@/request';
 
+const server = "/platform";
+
 let api = {
     /**
      * 请求配置列表
      */
     settingsListApi: function () {
-        return $http.get('/platform/api/v1/settings/list');
+        return $http.get(server + '/api/v1/settings/list');
     },
     /**
-     * 请求配置详情
+     * 获取配置详情
      */
     settingsDetailApi: function (id) {
-        return $http.get(`/platform/api/v1/settings/${id}`);
+        return $http.get(server + `/api/v1/settings/${id}`);
+    },
+
+    /**
+     * 获取配置详情
+     */
+    getDefaultSettings: function () {
+        return $http.get(server + `/api/v1/settings/default`);
     },
 
     /**

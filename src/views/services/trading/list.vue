@@ -50,7 +50,8 @@ export default {
     }
   },
   props: [
-    "items", "chooseInst"
+    "items",
+    "chooseInst"
   ],
   methods: {
     handleSwitchChange(enable, item, index) {

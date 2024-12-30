@@ -10,6 +10,7 @@
       >
         <el-menu-item index="file-storage">文件存储</el-menu-item>
         <el-menu-item index="config-management">配置管理</el-menu-item>
+        <el-menu-item index="instrument-sub">产品订阅</el-menu-item>
       </el-menu>
     </div>
 
@@ -19,20 +20,10 @@
 
       <!-- 搜索框和新增按钮 -->
       <div class="search-and-add">
-        <el-input
-            v-model="searchQuery"
-            placeholder="搜索产品/币种"
-            clearable
-            size="mini"
-            class="search-box"
-        ></el-input>
-        <el-button
-            type="primary"
-            size="mini"
-            @click="showAddProductDialog"
-        >
-          新增产品
-        </el-button>
+        <el-input v-model="searchQuery" placeholder="搜索产品/币种" clearable size="mini" class="search-box"/>
+        <el-button type="primary" size="medium" @click="showAddProductDialog">新增产品</el-button>
+        <el-button type="primary" size="medium" @click="startCollectAll">收集所有产品</el-button>
+        <el-button type="primary" size="medium" @click="syncAllInstFile">同步所有产品</el-button>
       </div>
 
       <!-- 产品列表 -->
@@ -106,11 +97,19 @@
       <h2>配置管理</h2>
       <p>这里是配置管理的内容，可以添加更多功能。</p>
     </div>
+
+    <!-- 产品订阅模块 -->
+    <div v-if="activeTab === 'instrument-sub'" class="tab-content">
+      <InstSub/>
+    </div>
   </div>
 </template>
 
 <script>
+import InstSub from '@/views/services/collector/instSub.vue'
+
 export default {
+  components: {InstSub},
   data() {
     return {
       activeTab: "file-storage", // 当前选中的一级菜单项
@@ -156,6 +155,21 @@ export default {
     showAddProductDialog() {
       this.addProductDialogVisible = true;
     },
+
+    startCollectAll() {
+      this.$http.collector.startCollectAll().then(resp => {
+        if (resp.code === 0) {
+          this.$message("操作成功");
+        } else {
+          this.$message("操作失败: ", resp.msg);
+        }
+      });
+    },
+
+    syncAllInstFile() {
+      this.$http.collector.kStoreFileSyncAll();
+    },
+
     // 新增产品方法
     addProduct() {
       console.log("新增产品ID", this.newProduct.instId)
