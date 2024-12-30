@@ -62,11 +62,13 @@
             </el-form-item>
 
             <el-form-item label="上下文配置">
-              <el-input
-                  type="text"
-                  v-model="settingsContextInput"
-                  @input="handleInput"
-              ></el-input>
+              <!--              <el-input
+                                type="text"
+                                v-model="settingsContextInput"
+                                @input="handleInput"
+                            ></el-input>-->
+              <el-button @click="showSettingsDetail=true" style="color: red; background-color: #0a8415">配置上下文
+              </el-button>
             </el-form-item>
 
             <!-- 时间选择器 -->
@@ -122,6 +124,16 @@
 
       </div>
     </div>
+
+    <div class="settingsDetail" v-if="showSettingsDetail">
+      <SettingDetail
+          :settings="instConfig.settingsContext"
+          :can-update="true"
+          :applyAll="localSaveSettingsContext"
+          :save="localSaveSettingsContext"/>
+      <!--      <el-button @click="showSettingsDetail=false">保存</el-button>-->
+    </div>
+
   </div>
 
 </template>
@@ -129,13 +141,16 @@
 <script>
 
 import store from "@/store";
+import SettingDetail from "@/views/components/settings/SettingsDetail.vue";
 
 
 export default {
   name: "home",
+  components: {SettingDetail},
   data() {
     return {
       showSettings: true,
+      showSettingsDetail: false,
       isPC: true,
       marketId: this.$route.query.marketId,
       marketName: this.$route.query.marketName,
@@ -174,6 +189,19 @@ export default {
         console.warn("输入的内容不是有效的 JSON 格式：", error.message);
       }
     },
+
+    localSaveSettingsContext() {
+      this.showSettingsDetail = false;
+    },
+
+    getDefaultSettings() {
+      this.$http.settings.getDefaultSettings().then(resp => {
+        if (resp.code === 0) {
+          this.instConfig.settingsContext = resp.data;
+        }
+      })
+    },
+
     // 判断是否为移动端
     isCheckPC() {
       var sUserAgent = navigator.userAgent.toLowerCase()
@@ -215,6 +243,7 @@ export default {
     } else {
       this.isPC = false
     }
+    this.getDefaultSettings();
   },
   computed: {
     bars() {
@@ -268,6 +297,20 @@ export default {
 
 button {
   color: red;
+}
+
+.settingsDetail {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 80%;
+  background-color: #000000;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 </style>

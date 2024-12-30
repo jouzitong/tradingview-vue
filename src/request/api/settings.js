@@ -17,7 +17,7 @@ let api = {
     },
 
     /**
-     * 获取配置详情
+     * 获取默认配置详情
      */
     getDefaultSettings: function () {
         return $http.get(server + `/api/v1/settings/default`);

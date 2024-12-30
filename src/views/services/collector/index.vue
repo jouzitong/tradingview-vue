@@ -8,15 +8,17 @@
           @select="switchTab"
           class="el-menu-dark"
       >
-        <el-menu-item index="file-storage">文件存储</el-menu-item>
+        <el-menu-item index="file-storage">产品订阅</el-menu-item>
         <el-menu-item index="config-management">配置管理</el-menu-item>
-        <el-menu-item index="instrument-sub">产品订阅</el-menu-item>
+        <!--        <el-menu-item index="instrument-sub">产品订阅</el-menu-item>-->
       </el-menu>
     </div>
 
     <!-- 文件存储模块 -->
     <div v-if="activeTab === 'file-storage'" class="tab-content">
-      <h2>文件存储</h2>
+      <h2>文件存储
+        <el-button @click="init">刷新</el-button>
+      </h2>
 
       <!-- 搜索框和新增按钮 -->
       <div class="search-and-add">
@@ -33,7 +35,22 @@
             :key="index"
             class="file-card"
         >
-          <h3>{{ product.instId }}</h3>
+          <div>
+            <h3>{{ product.instId }}
+              <template v-if="isSub(product.instId)">
+                <el-button style="background-color: green; color: black">已订阅</el-button>
+              </template>
+              <template v-if="!isSub(product.instId)">
+                <el-button
+                    style="background-color: red; color: black"
+                    @click="subInst(product.instId)"
+                >
+                  未订阅
+                </el-button>
+              </template>
+            </h3>
+
+          </div>
           <p><strong>币种:</strong> {{ product.ccy }}</p>
           <div class="data-section">
             <div
@@ -60,7 +77,7 @@
               <el-button
                   type="primary"
                   size="mini"
-                  @click="updateBar(product.instId, bar, dateInterval)"
+                  @click="updateBar(product.instId)"
               >更新
               </el-button>
               <el-button
@@ -80,9 +97,18 @@
           :visible.sync="addProductDialogVisible"
           width="400px"
       >
-        <el-form ref="addProductForm" :model="newProduct">
-          <el-form-item label="产品ID" :label-width="'80px'">
-            <el-input v-model="newProduct.instId" placeholder="请输入产品ID"></el-input>
+        <el-form>
+          <el-form-item label="产品ID">
+            <el-select v-model="newProduct.instId"
+                       filterable
+                       placeholder="请输入关键词搜索"
+                       :clearable="true">
+              <el-option
+                  v-for="item in allEnableSwapInstIds"
+                  :key="item"
+                  :label="item"
+                  :value="item"/>
+            </el-select>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -130,6 +156,8 @@ export default {
       newProduct: {
         instId: "",
       },
+      subInstList: [],
+      allEnableSwapInstIds: [],
     };
   },
   computed: {
@@ -144,11 +172,33 @@ export default {
               product.ccy.includes(this.searchQuery)
       );
     },
+    // 判断是否订阅了
+
   },
   methods: {
     // 切换一级菜单
     switchTab(tab) {
       this.activeTab = tab;
+    },
+
+    /**
+     * 是否已订阅
+     *
+     * @param instId
+     * @returns {boolean}
+     */
+    isSub(instId) {
+      return this.subInstList.includes(instId);
+    },
+
+    subInst(id) {
+      this.$http.collector.subInst(id).then(resp => {
+        if (resp.code === 0) {
+          this.$message.success("订阅成功");
+        } else {
+          this.$message.error("订阅失败: " + resp.msg);
+        }
+      });
     },
 
     // 显示新增产品对话框
@@ -177,13 +227,17 @@ export default {
         this.$message.error("产品ID不能为空");
         return;
       }
+      // 判断 this.newProduct.instId.trim() 如果不是-USDT-SWAP结尾的, 就拼接该字符串
+      if (!this.newProduct.instId.trim().endsWith("-USDT-SWAP")) {
+        this.newProduct.instId = this.newProduct.instId.trim() + "-USDT-SWAP";
+      }
       this.$http.collector.startCollectByInstId(this.newProduct.instId.trim());
       this.newProduct.instId = ""; // 清空输入框
       this.addProductDialogVisible = false;
     },
 
     // 更新数据方法
-    updateBar(productId, bar) {
+    updateBar(productId) {
       this.$http.collector.startCollectByInstId(productId);
     },
 
@@ -197,16 +251,31 @@ export default {
       })
     },
 
-    // 收集所有的历史数据 1m
-    collectAllInstHistoryData() {
-      this.$http.collector.startCollect().then(resp => {
+    getSubInstList() {
+      this.$http.collector.getSubInstList().then(resp => {
+        console.log("获取订阅的列表: ", resp.data)
         if (resp.code === 0) {
-          this.$message.success("操作成功");
+          this.subInstList = resp.data;
         } else {
-          this.$message.error("失败:" + resp.msg);
+          this.$message.error("获取产品订阅列表失败:" + resp.msg);
         }
-      })
+      });
     },
+
+    /**
+     * 获取所有的合约产品ID
+     */
+    getAllEnableSwapInstIds() {
+      this.$http.instruments.instIds().then(resp => {
+        console.log("获取所有的合约产品ID: ", resp.data)
+        if (resp.code === 0) {
+          this.allEnableSwapInstIds = resp.data;
+        } else {
+          this.$message.error("获取产品订阅列表失败:" + resp.msg);
+        }
+      });
+    },
+
     getKStoreInstList() {
       this.$http.collector.kStoreInstList().then(resp => {
         if (resp.code === 0) {
@@ -216,10 +285,20 @@ export default {
         }
       })
     },
+
+    init() {
+      this.getSubInstList();
+      this.getKStoreInstList();
+      this.getAllEnableSwapInstIds();
+    },
+
   },
 
   created() {
-    this.getKStoreInstList();
+    this.init();
+  },
+  mounted() {
+    this.init();
   }
 
 };

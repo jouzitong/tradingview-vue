@@ -15,7 +15,7 @@
                 <input type="checkbox"
                        v-model="settings.bars"
                        v-bind:value="val.code"
-                       v-bind:checked="settings.bars.includes(val.code)"/>
+                       v-bind:checked="settings.bars?.includes(val.code)"/>
                 {{ val.name }}
               </div>
             </div>
@@ -43,8 +43,8 @@
                    :value="true"
             />
             <span>是</span>
-
           </div>
+
           <div>
             <div>
               <label>下单金额: <span class="required">*</span></label>

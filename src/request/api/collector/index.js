@@ -52,6 +52,29 @@ let api = {
         return $http.get(`/platform/api/v1/historyData/file/download/all`);
     },
 
+    /**
+     * 产品信息订阅
+     */
+    subInst: function (id) {
+        return $http.get(`/collector/api/v1/mark-prices/sub/${id}`);
+    },
+
+    /**
+     * 产品信息订阅
+     */
+    unsubInst: function (id) {
+        return $http.get(`/collector/api/v1/mark-prices/unsub/${id}`);
+    },
+
+
+    /**
+     * 获取所有已经订阅了的产品列表
+     */
+    getSubInstList: function () {
+        return $http.get(`/collector/api/v1/mark-prices/subInstList`);
+    },
+
+
 }
 
 export default api
