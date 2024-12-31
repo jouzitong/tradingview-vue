@@ -10,15 +10,27 @@
       >
         <el-menu-item index="file-storage">产品订阅</el-menu-item>
         <el-menu-item index="config-management">配置管理</el-menu-item>
-        <!--        <el-menu-item index="instrument-sub">产品订阅</el-menu-item>-->
       </el-menu>
     </div>
 
     <!-- 文件存储模块 -->
     <div v-if="activeTab === 'file-storage'" class="tab-content">
-      <h2>文件存储
-        <el-button @click="init">刷新</el-button>
-      </h2>
+      <div class="tab-content-header" style="display: flex">
+        <div>
+          <h2>文件存储</h2>
+        </div>
+        <div>
+          <el-button @click="init">刷新</el-button>
+          <div class="status-light"
+               :style="{ backgroundColor: publicChannelState ? 'green' : 'red',
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '50%',}"
+               @click="toggleChannelState">
+          </div>
+        </div>
+      </div>
+
 
       <!-- 搜索框和新增按钮 -->
       <div class="search-and-add">
@@ -123,19 +135,12 @@
       <h2>配置管理</h2>
       <p>这里是配置管理的内容，可以添加更多功能。</p>
     </div>
-
-    <!-- 产品订阅模块 -->
-    <div v-if="activeTab === 'instrument-sub'" class="tab-content">
-      <InstSub/>
-    </div>
   </div>
 </template>
 
 <script>
-import InstSub from '@/views/services/collector/instSub.vue'
 
 export default {
-  components: {InstSub},
   data() {
     return {
       activeTab: "file-storage", // 当前选中的一级菜单项
@@ -158,6 +163,7 @@ export default {
       },
       subInstList: [],
       allEnableSwapInstIds: [],
+      publicChannelState: false,
     };
   },
   computed: {
@@ -179,6 +185,12 @@ export default {
     // 切换一级菜单
     switchTab(tab) {
       this.activeTab = tab;
+    },
+
+    toggleChannelState() {
+      // 切换状态
+      // this.publicChannelState = !this.publicChannelState;
+      this.reconnectPublicChannel();
     },
 
     /**
@@ -251,6 +263,29 @@ export default {
       })
     },
 
+    getChannelState() {
+      this.$http.collector.getChannelState().then(resp => {
+        if (resp.code === 0) {
+          this.publicChannelState = resp.data;
+        } else {
+          this.$message.error("失败:" + resp.msg);
+        }
+      })
+    },
+
+    reconnectPublicChannel() {
+      this.$http.collector.reconnectPublicChannel().then(resp => {
+        if (resp.code === 0) {
+          this.$message.success("操作成功, 稍后手动刷新页面")
+        } else {
+          this.$message.error("失败:" + resp.msg);
+        }
+      })
+    },
+
+    /**
+     * 获取已经订阅的列表
+     */
     getSubInstList() {
       this.$http.collector.getSubInstList().then(resp => {
         console.log("获取订阅的列表: ", resp.data)
@@ -276,6 +311,9 @@ export default {
       });
     },
 
+    /**
+     * 获取KStore实例列表
+     */
     getKStoreInstList() {
       this.$http.collector.kStoreInstList().then(resp => {
         if (resp.code === 0) {
@@ -290,13 +328,11 @@ export default {
       this.getSubInstList();
       this.getKStoreInstList();
       this.getAllEnableSwapInstIds();
+      this.getChannelState();
     },
 
   },
 
-  created() {
-    this.init();
-  },
   mounted() {
     this.init();
   }
@@ -377,6 +413,20 @@ export default {
 .bar-name {
   width: 80px;
   font-size: 14px;
+}
+
+/* 状态灯的基本样式 */
+.status-light {
+  transition: background-color 0.3s ease; /* 动画效果 */
+}
+
+.tab-content {
+  .tab-content-header {
+    display: flex;
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+    gap: 10px; /* 控制元素之间的间隔 */
+  }
 }
 
 .el-date-picker {

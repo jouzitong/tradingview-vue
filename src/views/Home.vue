@@ -62,11 +62,11 @@
             </el-form-item>
 
             <el-form-item label="上下文配置">
-              <!--              <el-input
-                                type="text"
-                                v-model="settingsContextInput"
-                                @input="handleInput"
-                            ></el-input>-->
+              <el-input
+                  type="text"
+                  v-model="settingsContextInput"
+                  @input="handleInput"
+              ></el-input>
               <el-button @click="showSettingsDetail=true" style="color: red; background-color: #0a8415">配置上下文
               </el-button>
             </el-form-item>
@@ -192,6 +192,7 @@ export default {
 
     localSaveSettingsContext() {
       this.showSettingsDetail = false;
+      this.settingsContextInput = JSON.stringify(this.instConfig.settingsContext);
     },
 
     getDefaultSettings() {

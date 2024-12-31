@@ -66,6 +66,21 @@ let api = {
         return $http.get(`/collector/api/v1/mark-prices/unsub/${id}`);
     },
 
+    /**
+     * 获取 Public 通道状态
+     */
+    getChannelState: function () {
+        return $http.get(`/collector/api/v1/mark-prices/channel/state/public`);
+    },
+
+    /**
+     * 重新连接 Public 通道
+     */
+    reconnectPublicChannel: function () {
+        return $http.get(`/collector/api/v1/mark-prices/channel/reconnect/public`);
+    },
+
+
 
     /**
      * 获取所有已经订阅了的产品列表

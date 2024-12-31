@@ -256,7 +256,7 @@
             </div>
           </div>
           <!-- K line -->
-          <div style="flex: 1" v-show="isShow('K line')">
+          <div style="flex: 1" v-if="isShow('K line')">
             <h2>K line</h2>
             <div ref="kLine" id="kLine" class="settings">
               <template v-for="(bar,index) in (bars)">
